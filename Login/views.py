@@ -20,7 +20,7 @@ def register_page(request):
     if request.session.get('status'):
         return redirect("/")
     else:
-        return render(request, 'Login/register.html', locals())
+        return render(request, 'Login/login.html', locals())
 
 
 def message_edit_page(request):
@@ -42,8 +42,8 @@ def login_post(request):
             request.session['status'] = True
             request.session['username'] = user_name
             request.session['password'] = user_password
-            return redirect("/")
-        return render(request, 'Login/login.html', {'status': True})
+            return render(request, 'Home/home.html', locals())
+        return render(request, 'Login/login.html', {'status': False})
     return render(request, 'Login/login.html', locals())
 
 
@@ -66,13 +66,13 @@ def register_post(request):
             request.session['username'] = user_name
             request.session['password'] = user_password
             return render(request, 'Home/home.html', locals())
-    return render(request, 'Login/login.html', locals())
+    return redirect("/auth/login_page")
 
 
 def sign_out(request):
     if request.session.get('status'):
         request.session.clear()
-    return redirect("/auth/login")
+    return redirect("/auth/login_page")
 
 
 @csrf_exempt
