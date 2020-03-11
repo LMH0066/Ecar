@@ -42,7 +42,7 @@ def login_post(request):
             request.session['status'] = True
             request.session['username'] = user_name
             request.session['password'] = user_password
-            return render(request, 'Home/home.html', locals())
+            return redirect("/")
         return render(request, 'Login/login.html', {'status': False})
     return render(request, 'Login/login.html', locals())
 
@@ -65,7 +65,7 @@ def register_post(request):
             request.session['status'] = True
             request.session['username'] = user_name
             request.session['password'] = user_password
-            return render(request, 'Home/home.html', locals())
+            return redirect("/")
     return redirect("/auth/login_page")
 
 

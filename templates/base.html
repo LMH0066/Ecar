@@ -42,12 +42,12 @@
 
         <ul class="navbar-item theme-brand flex-row  text-center">
             <li class="nav-item theme-logo">
-                <a href="index.html">
+                <a href="/">
                     <img src="/static/images/logo.svg" class="navbar-logo" alt="logo">
                 </a>
             </li>
             <li class="nav-item theme-text">
-                <a href="index.html" class="nav-link"> Ecar </a>
+                <a href="/" class="nav-link"> Ecar </a>
             </li>
         </ul>
 
@@ -125,9 +125,8 @@
         <ul class="navbar-nav flex-row">
             <li>
                 <div class="page-header">
-                    <div class="page-title">
-                        <h3>Blank Page</h3>
-                    </div>
+                    {% block page_title %}
+                    {% endblock %}
                 </div>
             </li>
         </ul>
@@ -220,7 +219,7 @@
                     </a>
                     <ul class="collapse submenu list-unstyled" id="submenu" data-parent="#accordionExample">
                         <li>
-                            <a href="javascript:void(0);"> Submenu 1 </a>
+                            <a href="/group/forum"> Forum </a>
                         </li>
                         <li>
                             <a href="javascript:void(0);"> Submenu 2 </a>
@@ -284,12 +283,8 @@
     <!--  BEGIN CONTENT PART  -->
     <div id="content" class="main-content">
         <div class="layout-px-spacing">
-
-            <div class="row layout-top-spacing">
-
-
-            </div>
-
+            {% block content %}
+            {% endblock %}
         </div>
         <div class="footer-wrapper">
             <div class="footer-section f-section-1">

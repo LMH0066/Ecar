@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Login',
     'Home',
+    'StudyGroup',
+    'Deck'
 ]
 
 MIDDLEWARE = [
@@ -117,7 +119,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
     os.path.join(BASE_DIR, "Login", "static"),
-    os.path.join(BASE_DIR, "Home", "static")
+    os.path.join(BASE_DIR, "Home", "static"),
+    os.path.join(BASE_DIR, "StudyGroup", "static"),
+    os.path.join(BASE_DIR, "Deck", "static")
 )
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
