@@ -3,5 +3,5 @@ from . import views
 
 app_name = 'Deck'
 urlpatterns = [
-    path('', views.go_home),
+    path('', views.go_deck),
 ]

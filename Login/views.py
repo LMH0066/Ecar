@@ -50,9 +50,9 @@ def login_post(request):
 @csrf_exempt
 def register_post(request):
     if request.method == 'POST' and not request.session.get('status'):
-        user_name = request.POST.get('username')
+        user_name = request.POST.get('reUsername')
         user_email = request.POST.get('email')
-        user_password = request.POST.get('password')
+        user_password = request.POST.get('rePassword')
         user = User.objects.filter(user_name=user_name)
         if user.exists():
             return render(request, 'Login/login.html', locals())
