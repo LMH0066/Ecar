@@ -54,7 +54,7 @@ def add_deck(request):
     return HttpResponse(json.dumps(ret))
 
 
-# 获取用户创建的所有卡组
+# 获取与用户有关的所有卡组
 @csrf_exempt
 def get_decks(request):
     if not request.session.get('status'):

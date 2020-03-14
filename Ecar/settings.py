@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'Login',
     'Home',
     'StudyGroup',
-    'Deck'
+    'Deck',
+    'Card'
 ]
 
 MIDDLEWARE = [
