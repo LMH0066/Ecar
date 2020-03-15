@@ -89,7 +89,7 @@ class Card(models.Model):
     # 创建时间
     c_time = models.DateTimeField(auto_now_add=True)
     # 上次记忆时间
-    last_memory_time = models.DateField()
+    last_memory_time = models.DateField(null=True)
     # 下次复习时间
     review_time = models.DateField()
     # 本次连续答对次数

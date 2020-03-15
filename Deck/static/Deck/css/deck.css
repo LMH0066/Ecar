@@ -139,3 +139,7 @@ h3 {
 .card-footer {
     background-color: #ffffff;
 }
+
+.modal-content .modal-body {
+    padding: 10px 26px;
+}

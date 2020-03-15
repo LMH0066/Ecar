@@ -32,7 +32,7 @@
 }
 
 .modal-content .modal-body a:not(.btn) {
-    color: #1b55e2;
+    /*color: #1b55e2;*/
     font-weight: 600;
 }
 

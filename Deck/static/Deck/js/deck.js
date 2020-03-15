@@ -7,7 +7,7 @@ $('#input-search').on('keyup', function () {
         return rex.test($(this).text());
     }).show();
 });
-
+// 点击添加卡组的按钮后
 $('#btn-add-deck').on('click', function () {
     swal({
         title: "Add Deck",
@@ -43,11 +43,43 @@ $('#btn-add-deck').on('click', function () {
                     }
                 },
                 error: function () {
-                    swal("Change Error!", "error");
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        padding: '2em'
+                    })
                 }
             })
         }
     });
+});
+// 点击添加卡片的按钮后
+$('#btn-add-card').on('click', function () {
+    let form_data = new FormData();
+    form_data.append('front_text', $('#input-add-front').val());
+    form_data.append('back_text', $('#input-add-back').val());
+    $.ajax({
+        url: "/card/addCard",
+        type: "POST",
+        data: form_data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function (result) {
+            if (result.status) {
+                let table = $('#card-table').DataTable();
+                table.row.add([$('#input-add-front').val(), $('#input-add-back').val()]).draw();
+            }
+        },
+        error: function () {
+            swal({
+                type: 'error',
+                title: 'Oops...',
+                padding: '2em'
+            })
+        }
+    })
 });
 
 $(function () {
@@ -55,6 +87,27 @@ $(function () {
     deck_a.attr("aria-expanded", true);
     deck_a.attr("data-active", true);
     showDecks();
+    $('#card-table').DataTable({
+        "bLengthChange": false, //开关，是否显示每页显示多少条数据的下拉框
+        "searching": false,
+        "ordering": false, // 禁止排序
+        "columns": [
+            {"frontDataType": "dom-text", type: 'string'},
+            {"orderDataType": "dom-text", type: 'string'},
+        ],
+        "oLanguage": {
+            "oPaginate": {
+                "sPrevious": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>',
+                "sNext": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>'
+            },
+            "sInfo": "Showing page _PAGE_ of _PAGES_",
+            "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
+            "sSearchPlaceholder": "Search...",
+            "sLengthMenu": "Results :  _MENU_",
+        },
+        "stripeClasses": [],
+        "pageLength": 6
+    });
 });
 
 function addDeck(deck_name, amount) {
@@ -77,6 +130,14 @@ function addDeck(deck_name, amount) {
         )
     ;
     $('.deck-container').append(deck_html);
+    //精确查找到所在卡组
+    let h3 = $("h3:contains('" + deck_name + "')").map(function () {
+        if ($(this).text() === deck_name)
+            return this;
+    });
+    let card = h3.parents('.card');
+    for (let i = 0; i < amount - 1; i++)
+        card.append($("<div class='child'></div>"));
 }
 
 function deleteDeck() {
@@ -153,21 +214,24 @@ function showDecks() {
                     addDeck(data.decks_name[i], data.decks_amount[i]);
                 }
             } else {
-                swal(result.data, "error");
+                swal({
+                    type: 'error',
+                    title: 'Oops...',
+                    padding: '2em'
+                })
             }
         },
         error: function () {
-            swal("Change Error!", "error");
+            swal({
+                type: 'error',
+                title: 'Oops...',
+                padding: '2em'
+            })
         }
     })
 }
 
 function showCards(deck_name) {
-    // let ev = window.event || arguments.callee.caller.arguments[0];
-    // if (window.event) ev.cancelBubble = true;
-    // else {
-    //     ev.stopPropagation();
-    // }
     $('#cardModalCenterTitle').html(deck_name);
     let form_data = new FormData();
     form_data.append('deck_name', deck_name);
@@ -183,16 +247,22 @@ function showCards(deck_name) {
             if (result.status) {
                 // 卡组有卡片
                 let data = result.data;
-                for (let i = 0; i < data.decks_name.length; i++) {
-                    addDeck(data.decks_name[i], data.decks_amount[i]);
+                let table = $('#card-table').DataTable();
+                table.clear();
+                for (let i = 0; i < data.front_text.length; i++) {
+                    table.row.add([data.front_text[i], data.back_text[i]]).draw();
                 }
             } else {
                 // 卡组没卡片
-                swal(result.data, "error");
+                // alert("data")
             }
         },
         error: function () {
-            swal("Change Error!", "error");
+            swal({
+                type: 'error',
+                title: 'Oops...',
+                padding: '2em'
+            })
         }
     })
 }
