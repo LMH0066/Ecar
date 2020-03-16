@@ -3,8 +3,8 @@ from django.db import models
 
 # Create your models here.
 class User(models.Model):
-    user_id = models.IntegerField(primary_key=True)
-    user_name = models.CharField(max_length=32)
+    user_id = models.AutoField(primary_key=True)
+    user_name = models.CharField(max_length=32, unique=True)
     password = models.CharField(max_length=32)
     email = models.EmailField()
     avatar = models.ImageField(upload_to="avatar", null=True, blank=True)

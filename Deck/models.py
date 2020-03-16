@@ -7,7 +7,7 @@ from Login.models import User
 
 
 class Deck(models.Model):
-    deck_id = models.IntegerField(primary_key=True)
+    deck_id = models.AutoField(primary_key=True)
     # 卡组名
     name = models.CharField(max_length=30)
     # 卡组内卡片总数

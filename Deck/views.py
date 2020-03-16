@@ -26,8 +26,13 @@ def delete_deck(request):
     deck_name = request.POST.get('deck_name')
     user = User.objects.get(user_name=request.session['username'])
     deck = user.deck_set.get(name=deck_name)
-    deck.delete()
     ret = {'status': True}
+    # 需要creator权限
+    if user.user_id == deck.creator.user_id:
+        deck.delete()
+    else:
+        ret['status'] = False
+        ret['data'] = 'Insufficient permissions'
     return HttpResponse(json.dumps(ret))
 
 
