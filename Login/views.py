@@ -57,10 +57,8 @@ def register_post(request):
         if user.exists():
             return render(request, 'Login/login.html', locals())
         else:
-            new_user = User.objects.create()
-            new_user.user_name = user_name
-            new_user.password = user_password
-            new_user.email = user_email
+            new_user = User.objects.create(user_name=user_name, password=user_password,
+                                           email=user_email)
             new_user.save()
             request.session['status'] = True
             request.session['username'] = user_name
