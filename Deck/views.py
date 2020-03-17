@@ -64,28 +64,14 @@ def add_deck(request):
 def get_decks(request):
     if not request.session.get('status'):
         return redirect("/auth/login_page")
-    user_name = request.session['username']
-    # 获取该用户创建的所有卡组 creator_decks, admin_decks, staff_decks
-    user = User.objects.get(user_name=user_name)
-    deck = user.deck_set.all()
+
+    # 获取该用户创建的所有卡组
+    user = User.objects.get(user_name=request.session['username'])
+    decks = user.deck_set.all()
     decks_name = []
     decks_amount = []
-    for deck in deck:
+    for deck in decks:
         decks_name.append(deck.name)
         decks_amount.append(deck.amount)
     ret = {'status': True, 'data': {'decks_name': decks_name, 'decks_amount': decks_amount}}
     return HttpResponse(json.dumps(ret))
-
-
-# 测试，返回多种权限的deck
-@csrf_exempt
-def get_more_decks(request):
-    if not request.session.get('status'):
-        return redirect("/auth/login_page")
-    user_name = request.session['username']
-    # 获取该用户创建的所有卡组 creator_decks, admin_decks, staff_decks
-    user = User.objects.get(user_name=user_name)
-    creator_decks = user.deck_set.all()
-    admin_decks = user.AdminsToDeck.all().difference(creator_decks)
-    staff_decks = user.StaffsToDeck.all().difference(admin_decks).difference(creator_decks)
-    return HttpResponse(json.dumps({'status': True}))
