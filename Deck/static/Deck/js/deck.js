@@ -147,7 +147,7 @@ function deleteDeck() {
         ev.stopPropagation();
     }
 
-    let thisType = $(this);
+    let thisType = $(ev.target);
     let deck_name = thisType.prev().prev().html();
     swal({
         title: 'Sure?',
