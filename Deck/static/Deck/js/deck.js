@@ -263,7 +263,9 @@ function deleteCard(svg) {
                 dataType: "json",
                 success: function (ret) {
                     if (ret.status) {
-                        $(svg).parents('tr').remove();
+                        // $(svg).parents('tr').remove();
+                        let table = $('#card-table').DataTable();
+                        table.row($(svg).parents('tr')).remove().draw();
                         let card = findCardSelector(ret.data.deck_name);
                         if (ret.data.card_amount > 0)
                             card.children("div:last").remove();
@@ -326,6 +328,7 @@ function showCards(deck_name) {
     $('#cardModalCenterTitle').html(deck_name);
     let form_data = new FormData();
     form_data.append('deck_name', deck_name);
+    let table = $('#card-table').DataTable();
     $.ajax({
         url: "/card/ShowCards",
         type: "POST",
@@ -338,17 +341,17 @@ function showCards(deck_name) {
             if (result.status) {
                 // 卡组有卡片
                 let data = result.data;
-                let table = $('#card-table').DataTable();
                 table.clear();
                 for (let i = 0; i < data.front_text.length; i++) {
                     table.row.add([data.front_text[i], data.back_text[i], btn_delete_card]).draw();
                 }
             } else {
                 // 卡组没卡片
-                // alert("data")
+                table.clear().draw();
             }
         },
         error: function () {
+            table.clear().draw();
             swal({
                 type: 'error',
                 title: 'Oops...',
