@@ -1,3 +1,12 @@
+function findCardSelector(deck_name) {
+    let h3 = $("h3:contains('" + deck_name + "')").map(function () {
+        if ($(this).text() === deck_name)
+            return this;
+    });
+    let card = h3.parents('.card');
+    return card;
+}
+
 //搜索功能
 $('#input-search').on('keyup', function () {
     let rex = new RegExp($(this).val(), 'i');
@@ -22,7 +31,7 @@ $('#btn-add-deck').on('click', function () {
             let form_data = new FormData();
             form_data.append('deck_name', result.value);
             $.ajax({
-                url: "/deck/AddDeck",
+                url: "/deck/CreateDeck",
                 type: "POST",
                 data: form_data,
                 cache: false,
@@ -56,8 +65,9 @@ $('#btn-add-deck').on('click', function () {
 // 点击添加卡片的按钮后
 $('#btn-add-card').on('click', function () {
     let form_data = new FormData();
-    form_data.append('front_text', $('#input-add-front').val());
-    form_data.append('back_text', $('#input-add-back').val());
+    let input_front = $('#input-add-front'), input_back = $('#input-add-back');
+    form_data.append('front_text', input_front.val());
+    form_data.append('back_text', input_back.val());
     $.ajax({
         url: "/card/addCard",
         type: "POST",
@@ -69,7 +79,16 @@ $('#btn-add-card').on('click', function () {
         success: function (result) {
             if (result.status) {
                 let table = $('#card-table').DataTable();
-                table.row.add([$('#input-add-front').val(), $('#input-add-back').val()]).draw();
+                table.row.add([input_front.val(), input_back.val()]).draw();
+                input_front.val("");
+                input_back.val("");
+                let card = findCardSelector(result.data.deck_name);
+                if (result.data.card_amount < 5)
+                    card.append($("<div class='child'></div>"));
+                let p =card.children().children('p');
+                p.text(result.data.card_amount + " cards");
+                let test = card.parent().css('--cards');
+                // alert(test)
             }
         },
         error: function () {
@@ -117,7 +136,7 @@ function addDeck(deck_name, amount) {
         "                      <div class='child' data-target='#cardModal' data-toggle='modal' onclick='showCards(" + deck_name + ")'>\n" +
         "                          <h3>" + deck_name + "</h3>\n" +
         "                          <p>" + amount + " cards</p>\n" +
-        "                          <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' onclick='deleteDeck()'" +
+        "                          <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' onclick='deleteDeck(this)'" +
         "                          viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' " +
         "                          stroke-linecap='round' stroke-linejoin='round' class='feather feather-trash-2 delete-deck'>" +
         "                              <polyline points='3 6 5 6 21 6'></polyline>" +
@@ -131,24 +150,19 @@ function addDeck(deck_name, amount) {
     ;
     $('.deck-container').append(deck_html);
     //精确查找到所在卡组
-    let h3 = $("h3:contains('" + deck_name + "')").map(function () {
-        if ($(this).text() === deck_name)
-            return this;
-    });
-    let card = h3.parents('.card');
-    for (let i = 0; i < amount - 1; i++)
+    let card = findCardSelector(deck_name);
+    for (let i = 0; i < amount - 1 && 5; i++)
         card.append($("<div class='child'></div>"));
 }
 
-function deleteDeck() {
+function deleteDeck(svg) {
     let ev = window.event || arguments.callee.caller.arguments[0];
     if (window.event) ev.cancelBubble = true;
     else {
         ev.stopPropagation();
     }
 
-    let thisType = $(ev.target);
-    let deck_name = thisType.prev().prev().html();
+    let deck_name = $(svg).prev().prev().html();
     swal({
         title: 'Sure?',
         type: 'info',
@@ -177,7 +191,7 @@ function deleteDeck() {
                 dataType: "json",
                 success: function (ret) {
                     if (ret.status) {
-                        thisType.parents('.items').remove()
+                        $(svg).parents('.items').remove()
                     } else {
                         swal({
                             type: 'error',

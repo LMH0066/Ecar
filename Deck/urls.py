@@ -5,6 +5,6 @@ app_name = 'Deck'
 urlpatterns = [
     path('', views.go_deck),
     path('ShowDecks', views.get_decks),
-    path('AddDeck', views.add_deck),
+    path('CreateDeck', views.create_deck),
     path('DeleteDeck', views.delete_deck),
 ]

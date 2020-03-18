@@ -36,9 +36,9 @@ def delete_deck(request):
     return HttpResponse(json.dumps(ret))
 
 
-# 增加卡组
+# 创建卡组
 @csrf_exempt
-def add_deck(request):
+def create_deck(request):
     if not request.session.get('status'):
         return redirect("/auth/login_page")
     new_deck_name = request.POST.get('deck_name')
@@ -67,10 +67,10 @@ def get_decks(request):
     user_name = request.session['username']
     # 获取该用户创建的所有卡组 creator_decks, admin_decks, staff_decks
     user = User.objects.get(user_name=user_name)
-    deck = user.deck_set.all()
+    decks = user.deck_set.all()
     decks_name = []
     decks_amount = []
-    for deck in deck:
+    for deck in decks:
         decks_name.append(deck.name)
         decks_amount.append(deck.amount)
     ret = {'status': True, 'data': {'decks_name': decks_name, 'decks_amount': decks_amount}}

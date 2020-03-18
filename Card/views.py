@@ -58,6 +58,7 @@ def add_card(request):
         new_memory_info.save()
         deck.amount = deck.amount + 1
         deck.save()
+        ret['data'] = {'deck_name': deck.name, 'card_amount': deck.amount}
     else:
         ret['status'] = False
         ret['data'] = 'Insufficient permissions'
