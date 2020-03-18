@@ -1,9 +1,34 @@
 let btn_delete_card = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'" +
     "fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' onclick='deleteCard(this)'" +
-    "stroke-linejoin='round' class='feather feather-x-circle table-cancel'>" +
+    "stroke-linejoin='round' class='card-btn' style='float:right'>" +
+    "<polyline points='3 6 5 6 21 6'></polyline>" +
+    "<path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'></path>" +
+    "<line x1='10' y1='11' x2='10' y2='17'></line>" +
+    "<line x1='14' y1='11' x2='14' y2='17'></line></svg>";
+
+let btn_modify_card = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'" +
+    "fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' onclick='modifyCard(this)'" +
+    "stroke-linejoin='round' class='card-btn' style='float:right'>" +
+    "<path d='M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z'></path></svg>";
+
+let btn_modify_ok = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'" +
+    "fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' id='btn-modify-ok' " +
+    "stroke-linejoin='round' class='modify-btn' style='float:right' display='none'>" +
+    "<path d='M22 11.08V12a10 10 0 1 1-5.93-9.14'></path>" +
+    "<polyline points='22 4 12 14.01 9 11.01'></polyline></svg>";
+
+let btn_modify_cancel = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'" +
+    "fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' id='btn-modify-cancel' " +
+    "stroke-linejoin='round' class='modify-btn' style='float:right' display='none'>" +
     "<circle cx='12' cy='12' r='10'></circle>" +
     "<line x1='15' y1='9' x2='9' y2='15'></line>" +
     "<line x1='9' y1='9' x2='15' y2='15'></line></svg>";
+
+let other_options = btn_delete_card + btn_modify_card + btn_modify_ok + btn_modify_cancel;
+// 是否正在修改卡片
+let card_modifying = false;
+// 权限
+let admins_permission = false;
 
 function findCardSelector(deck_name) {
     let h3 = $("h3:contains('" + deck_name + "')").map(function () {
@@ -14,7 +39,7 @@ function findCardSelector(deck_name) {
     return card;
 }
 
-//搜索功能
+// 搜索功能
 $('#input-search').on('keyup', function () {
     let rex = new RegExp($(this).val(), 'i');
     let items = $('.searchable-container .items');
@@ -50,20 +75,11 @@ $('#btn-add-deck').on('click', function () {
                         swal("Good job!", "Successfully add!", "success");
                         addDeck(result.value, 0);
                     } else {
-                        swal({
-                            type: 'error',
-                            title: 'Oops...',
-                            text: ret.data,
-                            padding: '2em'
-                        })
+                        Oops(ret.data);
                     }
                 },
                 error: function () {
-                    swal({
-                        type: 'error',
-                        title: 'Oops...',
-                        padding: '2em'
-                    })
+                    Oops("");
                 }
             })
         }
@@ -94,7 +110,7 @@ $('#btn-add-card').on('click', function () {
         success: function (result) {
             if (result.status) {
                 let table = $('#card-table').DataTable();
-                table.row.add([input_front.val(), input_back.val(), btn_delete_card]).draw();
+                table.row.add([input_front.val(), input_back.val(), other_options]).draw();
                 input_front.val("");
                 input_back.val("");
                 let card = findCardSelector(result.data.deck_name);
@@ -105,11 +121,7 @@ $('#btn-add-card').on('click', function () {
             }
         },
         error: function () {
-            swal({
-                type: 'error',
-                title: 'Oops...',
-                padding: '2em'
-            })
+            Oops("");
         }
     })
 });
@@ -130,9 +142,9 @@ $(function () {
         //     {"orderDataType": "dom-text", type: 'string'},
         // ],
         "columns": [
-            {width: "45%"},
-            {width: "45%"},
-            {width: "10%"}
+            {width: "40%"},
+            {width: "40%"},
+            {width: "20%"}
         ],
         "oLanguage": {
             "oPaginate": {
@@ -213,20 +225,11 @@ function deleteDeck(svg) {
                     if (ret.status) {
                         $(svg).parents('.items').remove()
                     } else {
-                        swal({
-                            type: 'error',
-                            title: 'Oops...',
-                            text: ret.data,
-                            padding: '2em'
-                        })
+                        Oops(ret.data);
                     }
                 },
                 error: function () {
-                    swal({
-                        type: 'error',
-                        title: 'Oops...',
-                        padding: '2em'
-                    })
+                    Oops("");
                 }
             })
         }
@@ -272,23 +275,79 @@ function deleteCard(svg) {
                         let p = card.children().children('p');
                         p.text(ret.data.card_amount + " cards");
                     } else {
-                        swal({
-                            type: 'error',
-                            title: 'Oops...',
-                            text: ret.data,
-                            padding: '2em'
-                        })
+                        Oops(ret.data);
                     }
                 },
                 error: function () {
-                    swal({
-                        type: 'error',
-                        title: 'Oops...',
-                        padding: '2em'
-                    })
+                    Oops("");
                 }
             })
         }
+    })
+}
+
+function modifyCard(svg) {
+    // 如果正在修改，提示报错
+    if (card_modifying || !admins_permission) {
+        Oops('');
+        return;
+    }
+    card_modifying = true;
+    let back_td = $(svg).parent().prev();
+    let front_td = back_td.prev();
+    let front_text = front_td.html();
+    let back_text = back_td.html();
+
+    let front_input = $("<input type='text' class='form-control' id='front-input'>");
+    front_input.val(front_text);
+    front_td.html("");
+    front_td.append(front_input);
+    let back_input = $("<input type='text' class='form-control' id='back-input'>");
+    back_input.val(back_text);
+    back_td.html("");
+    back_td.append(back_input);
+
+    let tr = front_td.parent();
+    let hidden_svg = tr.find('svg:hidden');
+    let visible_svg = tr.find('svg:visible');
+    hidden_svg.show();
+    visible_svg.hide();
+
+    $('#btn-modify-ok').on("click", function () {
+        let form_data = new FormData();
+        form_data.append('new_front_text', front_input.val());
+        form_data.append('front_text', front_text);
+        form_data.append('new_back_text', back_input.val());
+        $.ajax({
+            url: "/card/ModifyCard",
+            type: "POST",
+            data: form_data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            success: function (result) {
+                if (result.status) {
+                    front_td.html(front_input.val());
+                    back_td.html(back_input.val());
+                    hidden_svg.hide();
+                    visible_svg.show();
+                    card_modifying = false;
+                } else
+                    Oops(result.data)
+            },
+            error: function () {
+                Oops("");
+            }
+        });
+    });
+
+    $('#btn-modify-cancel').on("click", function () {
+        front_td.html(front_text);
+        back_td.html(back_text);
+        hidden_svg.hide();
+        visible_svg.show();
+        card_modifying = false;
     })
 }
 
@@ -325,6 +384,8 @@ function showDecks() {
 }
 
 function showCards(deck_name) {
+    applyPermission();
+    card_modifying = false;
     $('#cardModalCenterTitle').html(deck_name);
     let form_data = new FormData();
     form_data.append('deck_name', deck_name);
@@ -343,7 +404,7 @@ function showCards(deck_name) {
                 let data = result.data;
                 table.clear();
                 for (let i = 0; i < data.front_text.length; i++) {
-                    table.row.add([data.front_text[i], data.back_text[i], btn_delete_card]).draw();
+                    table.row.add([data.front_text[i], data.back_text[i], other_options]).draw();
                 }
             } else {
                 // 卡组没卡片
@@ -352,11 +413,33 @@ function showCards(deck_name) {
         },
         error: function () {
             table.clear().draw();
-            swal({
-                type: 'error',
-                title: 'Oops...',
-                padding: '2em'
-            })
+            Oops("");
         }
+    })
+}
+
+function applyPermission() {
+    $.ajax({
+        url: "/card/ApplyPermission",
+        type: "POST",
+        cache: false,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function (result) {
+            admins_permission = !!result.status;
+        },
+        error: function () {
+            admins_permission = false;
+        }
+    });
+}
+
+function Oops(info) {
+    swal({
+        type: 'error',
+        title: 'Oops...',
+        text: info,
+        padding: '2em'
     })
 }

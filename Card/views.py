@@ -14,6 +14,13 @@ from Login.models import User
 import datetime
 
 
+# 访问卡片复习页面
+def go_review(request):
+    if not request.session.get('status'):
+        return redirect("/auth/login_page")
+    return render(request, 'Card/review.html')
+
+
 # 通过deck获得相应卡片
 @csrf_exempt
 def get_cards(request):
@@ -67,6 +74,7 @@ def add_card(request):
     return HttpResponse(json.dumps(ret))
 
 
+# 删除卡片
 @csrf_exempt
 def remove_card(request):
     front_text = request.POST.get('front_text')
@@ -87,27 +95,34 @@ def remove_card(request):
     return HttpResponse(json.dumps(ret))
 
 
+# 是否有管理者或以上的身份
 @csrf_exempt
-def modify_card(request):
-    front_text = request.POST.get('front_text')
-    back_text = request.POST.get('back_text')
+def apply_permission(request):
     deck = Deck.objects.get(deck_id=request.session['deck_id'])
     user = User.objects.get(user_name=request.session['username'])
-    ret = {'status': True}
     # 需要admin以上权限
     if (user.user_id == deck.creator.user_id or
             user in deck.admins.all()):
-        # 判断是否有重名卡片
-        cards = deck.card_set.all()
-        for card in cards:
-            if card.q_text == front_text:
-                ret['status'] = False
-                ret['data'] = 'Already has a Card with the same question'
-                return HttpResponse(json.dumps(ret))
-        Card.objects.filter(card_id=request.session['card_id']).update(q_text=front_text, ans_text=back_text)
+        return HttpResponse(json.dumps({'status': True}))
     else:
-        ret['status'] = False
-        ret['data'] = 'Insufficient permissions'
+        return HttpResponse(json.dumps({'status': False, 'data': 'Insufficient permissions'}))
+
+
+# 修改卡片
+@csrf_exempt
+def modify_card(request):
+    front_text = request.POST.get('front_text')
+    new_front_text = request.POST.get('new_front_text')
+    new_back_text = request.POST.get('new_back_text')
+    deck = Deck.objects.get(deck_id=request.session['deck_id'])
+    ret = {'status': True}
+    cards = deck.card_set.all()
+    for card in cards:
+        if card.q_text == new_front_text:
+            ret['status'] = False
+            ret['data'] = 'Already has a Card with the same question'
+            return HttpResponse(json.dumps(ret))
+    cards.filter(q_text=front_text).update(q_text=new_front_text, ans_text=new_back_text)
     return HttpResponse(json.dumps(ret))
 
 

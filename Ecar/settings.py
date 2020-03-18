@@ -122,7 +122,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "Login", "static"),
     os.path.join(BASE_DIR, "Home", "static"),
     os.path.join(BASE_DIR, "StudyGroup", "static"),
-    os.path.join(BASE_DIR, "Deck", "static")
+    os.path.join(BASE_DIR, "Deck", "static"),
+    os.path.join(BASE_DIR, "Card", "static")
 )
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
