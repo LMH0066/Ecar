@@ -1,3 +1,10 @@
+let btn_delete_card = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'" +
+    "fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' onclick='deleteCard(this)'" +
+    "stroke-linejoin='round' class='feather feather-x-circle table-cancel'>" +
+    "<circle cx='12' cy='12' r='10'></circle>" +
+    "<line x1='15' y1='9' x2='9' y2='15'></line>" +
+    "<line x1='9' y1='9' x2='15' y2='15'></line></svg>";
+
 function findCardSelector(deck_name) {
     let h3 = $("h3:contains('" + deck_name + "')").map(function () {
         if ($(this).text() === deck_name)
@@ -66,6 +73,14 @@ $('#btn-add-deck').on('click', function () {
 $('#btn-add-card').on('click', function () {
     let form_data = new FormData();
     let input_front = $('#input-add-front'), input_back = $('#input-add-back');
+    if (input_front.val() === "" || input_back.val() === "") {
+        swal({
+            type: 'error',
+            title: 'The input field is empty',
+            padding: '2em'
+        });
+        return;
+    }
     form_data.append('front_text', input_front.val());
     form_data.append('back_text', input_back.val());
     $.ajax({
@@ -79,16 +94,14 @@ $('#btn-add-card').on('click', function () {
         success: function (result) {
             if (result.status) {
                 let table = $('#card-table').DataTable();
-                table.row.add([input_front.val(), input_back.val()]).draw();
+                table.row.add([input_front.val(), input_back.val(), btn_delete_card]).draw();
                 input_front.val("");
                 input_back.val("");
                 let card = findCardSelector(result.data.deck_name);
                 if (result.data.card_amount < 5)
                     card.append($("<div class='child'></div>"));
-                let p =card.children().children('p');
+                let p = card.children().children('p');
                 p.text(result.data.card_amount + " cards");
-                let test = card.parent().css('--cards');
-                // alert(test)
             }
         },
         error: function () {
@@ -110,9 +123,16 @@ $(function () {
         "bLengthChange": false, //开关，是否显示每页显示多少条数据的下拉框
         "searching": false,
         "ordering": false, // 禁止排序
+        "bInfo": false,
+        "bAutoWidth": false,
+        // "columns": [
+        //     {"orderDataType": "dom-text", type: 'string'},
+        //     {"orderDataType": "dom-text", type: 'string'},
+        // ],
         "columns": [
-            {"frontDataType": "dom-text", type: 'string'},
-            {"orderDataType": "dom-text", type: 'string'},
+            {width: "45%"},
+            {width: "45%"},
+            {width: "10%"}
         ],
         "oLanguage": {
             "oPaginate": {
@@ -213,6 +233,63 @@ function deleteDeck(svg) {
     })
 }
 
+function deleteCard(svg) {
+    let front_text = $(svg).parent().prev().prev().html();
+    swal({
+        title: 'Sure?',
+        type: 'info',
+        html: 'Are you sure to delete it?',
+        showCloseButton: true,
+        showCancelButton: true,
+        focusConfirm: false,
+        confirmButtonText:
+            '<i class="flaticon-checked-1"></i> Great!',
+        confirmButtonAriaLabel: 'Thumbs up, great!',
+        cancelButtonText:
+            '<i class="flaticon-cancel-circle"></i> Cancel',
+        cancelButtonAriaLabel: 'Thumbs down',
+        padding: '2em'
+    }).then(function (result) {
+        if (result.value) {
+            let form_data = new FormData();
+            form_data.append('front_text', front_text);
+            $.ajax({
+                url: "/card/RemoveCard",
+                type: "POST",
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                dataType: "json",
+                success: function (ret) {
+                    if (ret.status) {
+                        $(svg).parents('tr').remove();
+                        let card = findCardSelector(ret.data.deck_name);
+                        if (ret.data.card_amount > 0)
+                            card.children("div:last").remove();
+                        let p = card.children().children('p');
+                        p.text(ret.data.card_amount + " cards");
+                    } else {
+                        swal({
+                            type: 'error',
+                            title: 'Oops...',
+                            text: ret.data,
+                            padding: '2em'
+                        })
+                    }
+                },
+                error: function () {
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        padding: '2em'
+                    })
+                }
+            })
+        }
+    })
+}
+
 function showDecks() {
     $.ajax({
         url: "/deck/ShowDecks",
@@ -264,7 +341,7 @@ function showCards(deck_name) {
                 let table = $('#card-table').DataTable();
                 table.clear();
                 for (let i = 0; i < data.front_text.length; i++) {
-                    table.row.add([data.front_text[i], data.back_text[i]]).draw();
+                    table.row.add([data.front_text[i], data.back_text[i], btn_delete_card]).draw();
                 }
             } else {
                 // 卡组没卡片

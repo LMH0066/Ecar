@@ -14,6 +14,7 @@ from Login.models import User
 import datetime
 
 
+# 通过deck获得相应卡片
 @csrf_exempt
 def get_cards(request):
     deck_name = request.POST.get('deck_name')
@@ -34,6 +35,7 @@ def get_cards(request):
     return HttpResponse(json.dumps(ret))
 
 
+# 增加卡片
 @csrf_exempt
 def add_card(request):
     front_text = request.POST.get('front_text')
@@ -76,6 +78,9 @@ def remove_card(request):
     if (user.user_id == card.deck.creator.user_id or
             user in card.deck.admins.all()):
         Card.objects.filter(card_id=card.card_id).delete()
+        deck.amount = deck.amount - 1
+        deck.save()
+        ret['data'] = {'deck_name': deck.name, 'card_amount': deck.amount}
     else:
         ret['status'] = False
         ret['data'] = 'Insufficient permissions'
