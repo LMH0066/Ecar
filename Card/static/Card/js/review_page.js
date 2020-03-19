@@ -1,12 +1,9 @@
 $.fn.commentCards = function () {
-
     return this.each(function () {
-
         let $this = $(this),
             $cards = $this.find('.card'),
             $current = $cards.filter('.card--current'),
             $next;
-
         $cards.on('click', function () {
             if (!$current.is(this)) {
                 $cards.removeClass('card--current card--out card--next');
@@ -17,16 +14,12 @@ $.fn.commentCards = function () {
                 $next.addClass('card--next');
             }
         });
-
         if (!$current.length) {
             $current = $cards.last();
             $cards.first().trigger('click');
         }
-
         $this.addClass('cards--active');
-
     })
-
 };
 
 $(function () {

@@ -313,6 +313,9 @@ function modifyCard(svg) {
     hidden_svg.show();
     visible_svg.hide();
 
+    $('#btn-modify-ok').unbind("click");
+    $('#btn-modify-cancel').unbind("click");
+
     $('#btn-modify-ok').on("click", function () {
         let form_data = new FormData();
         form_data.append('new_front_text', front_input.val());
@@ -384,7 +387,6 @@ function showDecks() {
 }
 
 function showCards(deck_name) {
-    applyPermission();
     card_modifying = false;
     $('#cardModalCenterTitle').html(deck_name);
     let form_data = new FormData();
@@ -410,6 +412,7 @@ function showCards(deck_name) {
                 // 卡组没卡片
                 table.clear().draw();
             }
+            applyPermission();
         },
         error: function () {
             table.clear().draw();
