@@ -29,6 +29,12 @@ def message_edit_page(request):
     return render(request, 'Login/message_edit.html')
 
 
+def profile_page(request):
+    if not request.session.get('status'):
+        return redirect("/auth/login")
+    return render(request, 'Login/profile.html')
+
+
 @csrf_exempt
 def login_post(request):
     if request.method == 'POST' and not request.session.get('status'):
@@ -77,9 +83,8 @@ def sign_out(request):
 def get_information(request):
     if not request.session.get('status'):
         return redirect("/auth/login")
-    user = User.objects.get(email=request.session['email'])
+    user = User.objects.get(user_name=request.session['username'])
     ret = {'status': True,
-           'data': {'firstName': user.firstName, 'lastName': user.lastName,
-                    'email': user.email, 'avatar': user.avatar.name,
-                    'bio': user.bio}}
+           'data': {'userName': user.user_name, 'email': user.email,
+                    'avatar': user.avatar.name}}
     return HttpResponse(json.dumps(ret))
