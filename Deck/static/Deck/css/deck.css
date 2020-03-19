@@ -172,3 +172,8 @@ h3 {
     color: #fff;
     background: #088;
 }
+
+.table > tbody > tr > td {
+    white-space: normal !important;
+    word-break: break-all;
+}

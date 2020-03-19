@@ -142,9 +142,9 @@ $(function () {
         //     {"orderDataType": "dom-text", type: 'string'},
         // ],
         "columns": [
-            {width: "40%"},
-            {width: "40%"},
-            {width: "20%"}
+            {width: "45%"},
+            {width: "45%"},
+            {width: "10%"}
         ],
         "oLanguage": {
             "oPaginate": {
