@@ -12,14 +12,14 @@ let btn_modify_card = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height
     "<path d='M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z'></path></svg>";
 
 let btn_modify_ok = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'" +
-    "fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' id='btn-modify-ok' " +
-    "stroke-linejoin='round' class='modify-btn' style='float:right' display='none'>" +
+    "fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'" +
+    "stroke-linejoin='round' class='modify-btn btn-modify-ok' style='float:right' display='none'>" +
     "<path d='M22 11.08V12a10 10 0 1 1-5.93-9.14'></path>" +
     "<polyline points='22 4 12 14.01 9 11.01'></polyline></svg>";
 
 let btn_modify_cancel = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'" +
-    "fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' id='btn-modify-cancel' " +
-    "stroke-linejoin='round' class='modify-btn' style='float:right' display='none'>" +
+    "fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'" +
+    "stroke-linejoin='round' class='modify-btn btn-modify-cancel' style='float:right' display='none'>" +
     "<circle cx='12' cy='12' r='10'></circle>" +
     "<line x1='15' y1='9' x2='9' y2='15'></line>" +
     "<line x1='9' y1='9' x2='15' y2='15'></line></svg>";
@@ -313,10 +313,10 @@ function modifyCard(svg) {
     hidden_svg.show();
     visible_svg.hide();
 
-    $('#btn-modify-ok').unbind("click");
-    $('#btn-modify-cancel').unbind("click");
+    $('.btn-modify-ok').unbind("click");
+    $('.btn-modify-cancel').unbind("click");
 
-    $('#btn-modify-ok').on("click", function () {
+    $('.btn-modify-ok').on("click", function () {
         let form_data = new FormData();
         form_data.append('new_front_text', front_input.val());
         form_data.append('front_text', front_text);
@@ -345,7 +345,7 @@ function modifyCard(svg) {
         });
     });
 
-    $('#btn-modify-cancel').on("click", function () {
+    $('.btn-modify-cancel').on("click", function () {
         front_td.html(front_text);
         back_td.html(back_text);
         hidden_svg.hide();
