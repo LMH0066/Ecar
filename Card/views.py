@@ -117,11 +117,14 @@ def modify_card(request):
     deck = Deck.objects.get(deck_id=request.session['deck_id'])
     ret = {'status': True}
     cards = deck.card_set.all()
-    for card in cards:
-        if card.q_text == new_front_text:
-            ret['status'] = False
-            ret['data'] = 'Already has a Card with the same question'
-            return HttpResponse(json.dumps(ret))
+    if front_text == new_front_text:
+        cards.filter(q_text=front_text).update(ans_text=new_back_text)
+    else:
+        for card in cards:
+            if card.q_text == new_front_text:
+                ret['status'] = False
+                ret['data'] = 'Already has a Card with the same question'
+                return HttpResponse(json.dumps(ret))
     cards.filter(q_text=front_text).update(q_text=new_front_text, ans_text=new_back_text)
     return HttpResponse(json.dumps(ret))
 
@@ -129,31 +132,42 @@ def modify_card(request):
 @csrf_exempt
 def get_memory_card(request):
     ret = {'status': True}
+    memory_cards = []
     user_name = request.session['username']
     deck_id = request.session['deck_id']
+    deck = Deck.objects.get(deck_id=deck_id)
+    review_nums = deck.need_review_nums - DeckInfo.objects.get(user__user_name=user_name,
+                                                               deck__deck_id=deck_id).now_review_nums
     infos = MemoryInfo.objects.filter(user__user_name=user_name,
                                       card__deck__deck_id=deck_id,
                                       review_time__lte=datetime.date.today(),
-                                      memory_times__gt=0).order_by('?')[:1]
+                                      memory_times__gt=0).order_by('?')
     # 复习
     if infos.exists():
-        info = infos.first()
-        card = info.card
-        data = model_to_dict(card)
-        ret['data'] = data
+        for info in infos:
+            memory_cards.append(info.card)
     # 新卡片
     else:
-        infos = MemoryInfo.objects.filter(user__user_name=user_name,
-                                          card__deck__deck_id=deck_id,
-                                          memory_times=0).order_by('?')[:1]
+
+        max_nums = MemoryInfo.objects.filter(user__user_name=user_name,
+                                             card__deck__deck_id=deck_id,
+                                             memory_times=0).count()
+        if review_nums > max_nums:
+            infos = MemoryInfo.objects.filter(user__user_name=user_name,
+                                              card__deck__deck_id=deck_id,
+                                              memory_times=0).order_by('?')
+        else:
+            infos = MemoryInfo.objects.filter(user__user_name=user_name,
+                                              card__deck__deck_id=deck_id,
+                                              memory_times=0).order_by('?')[:review_nums]
         if infos.exists():
-            info = infos.first()
-            card = info.card
-            data = model_to_dict(card)
-            ret['data'] = data
+            for info in infos:
+                memory_cards.append(info.card)
         else:
             ret['status'] = False
             ret['data'] = "No Card To Learn"
+            return HttpResponse(json.dumps(ret))
+    ret = {'status': True, 'data': {'cards': memory_cards}}
     return HttpResponse(json.dumps(ret))
 
 

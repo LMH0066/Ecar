@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
-from Deck.models import Deck
+from Deck.models import Deck, DeckInfo
 from Login.models import User
 
 
@@ -56,6 +56,8 @@ def create_deck(request):
 
     new_deck = Deck(name=new_deck_name, creator=user)
     new_deck.save()
+    new_deck_info = DeckInfo(deck=new_deck, user=user)
+    new_deck_info.save()
     return HttpResponse(json.dumps(ret))
 
 
@@ -70,10 +72,14 @@ def get_decks(request):
     decks = user.deck_set.all()
     decks_name = []
     decks_amount = []
+    decks_review = []
     for deck in decks:
         decks_name.append(deck.name)
         decks_amount.append(deck.amount)
-    ret = {'status': True, 'data': {'decks_name': decks_name, 'decks_amount': decks_amount}}
+        review_nums = deck.need_review_nums - DeckInfo.objects.get(user__user_id=user.user_id,
+                                                                   deck__deck_id=deck.deck_id).now_review_nums
+        decks_review.append(review_nums)
+    ret = {'status': True, 'data': {'decks_name': decks_name, 'decks_amount': decks_amount, 'decks_review': decks_review}}
     return HttpResponse(json.dumps(ret))
 
 
