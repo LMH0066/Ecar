@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.forms.models import model_to_dict
+from django.core import serializers
 
 from Card.models import Card, MemoryInfo
 from Deck.models import Deck, DeckInfo
@@ -134,7 +135,7 @@ def get_memory_card(request):
     ret = {'status': True}
     memory_cards = []
     user_name = request.session['username']
-    deck_id = request.session['deck_id']
+    deck_id = request.POST.get('deck_id')
     deck = Deck.objects.get(deck_id=deck_id)
     review_nums = deck.need_review_nums - DeckInfo.objects.get(user__user_name=user_name,
                                                                deck__deck_id=deck_id).now_review_nums
@@ -167,7 +168,8 @@ def get_memory_card(request):
             ret['status'] = False
             ret['data'] = "No Card To Learn"
             return HttpResponse(json.dumps(ret))
-    ret = {'status': True, 'data': {'cards': memory_cards}}
+    memory_cards = serializers.serialize("json", memory_cards)
+    ret = {'status': True, 'data': json.loads(memory_cards)}
     return HttpResponse(json.dumps(ret))
 
 

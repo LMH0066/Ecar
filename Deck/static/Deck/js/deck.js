@@ -29,6 +29,7 @@ let other_options = btn_delete_card + btn_modify_card + btn_modify_ok + btn_modi
 let card_modifying = false;
 // 权限
 let admins_permission = false;
+
 // 通过deck_name找到元素
 function findCardSelector(deck_name) {
     let h3 = $("h3:contains('" + deck_name + "')").map(function () {
@@ -37,6 +38,7 @@ function findCardSelector(deck_name) {
     });
     return h3.parents('.card');
 }
+
 // 搜索功能
 $('#input-search').on('keyup', function () {
     let rex = new RegExp($(this).val(), 'i');
@@ -76,7 +78,7 @@ $('#btn-add-deck').on('click', function () {
                 success: function (ret) {
                     if (ret.status) {
                         swal("Good job!", "Successfully add!", "success");
-                        addDeck(result.value, 0);
+                        addDeck(result.value, 0, 0);
                     } else {
                         Oops(ret.data);
                     }
@@ -141,9 +143,9 @@ $(function () {
         "bInfo": false,
         "bAutoWidth": false,
         "columns": [
-            {width: "45%"},
-            {width: "45%"},
-            {width: "10%"}
+            {width: "45%", sClass: "td-front"},
+            {width: "45%", sClass: "td-back"},
+            {width: "10%", sClass: "td-options"}
         ],
         "oLanguage": {
             "oPaginate": {
@@ -159,14 +161,16 @@ $(function () {
         "pageLength": 6
     });
 });
+
 // 创建卡组
-function addDeck(deck_name, amount) {
+function addDeck(deck_id, deck_name, amount, need_review_amout) {
     let divElement = document.createElement("div");
     let deck_html = $("<div class='col-xl-3 col-lg-3 col-md-6 col-sm-6 items' style='--cards:" + amount + ";'>" +
         "                  <div class='card'>" +
-        "                      <div class='child' data-target='#cardModal' data-toggle='modal' onclick='showCards(" + deck_name + ")'>" +
+        "                      <div class='child' data-target='#cardModal' data-toggle='modal' " +
+        "                       onclick='showCards(" + deck_name + ")' id='" + deck_id + "'>" +
         "                          <h3>" + deck_name + "</h3>" +
-        "                          <p>" + amount + " cards</p>" +
+        "                          <p>" + amount + " cards(" + need_review_amout + ")</p>" +
         "                          <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' onclick='deleteDeck(this)'" +
         "                          viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' " +
         "                          stroke-linecap='round' stroke-linejoin='round' class='deck-option'>" +
@@ -182,13 +186,14 @@ function addDeck(deck_name, amount) {
         "                        </div>" +
         "                    </div>" +
         "              </div>"
-        );
+    );
     $('.deck-container').append(deck_html);
     //精确查找到所在卡组
     let card = findCardSelector(deck_name);
     for (let i = 0; i < amount - 1 && 5; i++)
         card.append($("<div class='child'></div>"));
 }
+
 // 删除卡组
 function deleteDeck(svg) {
     let ev = window.event || arguments.callee.caller.arguments[0];
@@ -238,6 +243,7 @@ function deleteDeck(svg) {
         }
     })
 }
+
 // 卡组复习
 function reviewDeck(svg) {
     let ev = window.event || arguments.callee.caller.arguments[0];
@@ -246,32 +252,56 @@ function reviewDeck(svg) {
         ev.stopPropagation();
     }
 
-    let deck_name = $(svg).parent().children('h3').html();
-    let form_data = new FormData();
-    form_data.append('deck_name', deck_name);
-    $.ajax({
-        url: "/deck/ReviewDeck",
-        type: "POST",
-        data: form_data,
-        cache: false,
-        contentType: false,
-        processData: false,
-        dataType: "json",
-        success: function (ret) {
-            if (ret.status) {
-                $(svg).parents('.items').remove()
-            } else {
-                Oops(ret.data);
+    let p_text = $(svg).parent().children('p').html();
+    let review_amount = p_text.match(/\((.+?)\)/g)[0];
+    review_amount = review_amount.substring(1, review_amount.length - 1);
+    if (review_amount === 0) {
+        Oops("There are no cards need review");
+        return;
+    }
+
+    let deck_id = $(svg).parent().attr("id");
+    let reviewWindow = window.open("/card/review_card");
+    reviewWindow.onload = function () {
+        let form_data = new FormData();
+        form_data.append('deck_id', deck_id);
+        $.ajax({
+            url: "/card/GetMemoryCar",
+            type: "POST",
+            data: form_data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            success: function (ret) {
+                if (ret["status"]) {
+                    let $cards = reviewWindow.$('.cards');
+                    for (let i = 0; i < ret["data"].length; i++) {
+                        let fields = ret["data"][i]["fields"];
+                        $cards.append($("<li class='card'>" +
+                            "                <div class='card-front'>" +
+                            "                    <h1>Review Card " + (i + 1) + " </h1>" +
+                            "                    <br/>" +
+                            "                    <h3>" + fields["q_text"] + "</h3>" +
+                            "                </div>" +
+                            "            </li>"))
+                    }
+                    $cards.commentCards();
+                    // reviewWindow.console.log($cards);
+                } else {
+                    Oops(ret.data);
+                }
+            },
+            error: function () {
+                Oops("");
             }
-        },
-        error: function () {
-            Oops("");
-        }
-    })
+        })
+    };
 }
+
 // 删除卡片
 function deleteCard(svg) {
-    let front_text = $(svg).parent().prev().prev().html();
+    let front_text = $(svg).parents('tr').children('.td-front').html();
     swal({
         title: 'Sure?',
         type: 'info',
@@ -319,6 +349,7 @@ function deleteCard(svg) {
         }
     })
 }
+
 // 修改卡片
 function modifyCard(svg) {
     // 如果正在修改，提示报错
@@ -327,8 +358,8 @@ function modifyCard(svg) {
         return;
     }
     card_modifying = true;
-    let back_td = $(svg).parent().prev();
-    let front_td = back_td.prev();
+    let back_td = $(svg).parents('tr').children('.td-back');
+    let front_td = $(svg).parents('tr').children('.td-front');
     let front_text = front_td.html();
     let back_text = back_td.html();
 
@@ -387,6 +418,16 @@ function modifyCard(svg) {
         card_modifying = false;
     })
 }
+
+// showDecks()中用于判断哪个卡组需要复习的卡片更多
+function compareByReviewNums(property) {
+    return function (a, b) {
+        let value1 = a[property];
+        let value2 = b[property];
+        return value2 - value1;
+    }
+}
+
 // 显示所有卡组
 function showDecks() {
     $.ajax({
@@ -399,8 +440,9 @@ function showDecks() {
         success: function (result) {
             if (result.status) {
                 let data = result.data;
-                for (let i = 0; i < data.decks_name.length; i++) {
-                    addDeck(data.decks_name[i], data.decks_amount[i]);
+                data.sort(compareByReviewNums('review_nums'));
+                for (let i = 0; i < data.length; i++) {
+                    addDeck(data[i].deck_id, data[i].deck_name, data[i].card_amount, data[i].review_nums);
                 }
             } else {
                 swal({
@@ -419,6 +461,7 @@ function showDecks() {
         }
     })
 }
+
 // 显示所有卡片
 function showCards(deck_name) {
     card_modifying = false;
@@ -454,6 +497,7 @@ function showCards(deck_name) {
         }
     })
 }
+
 // 查询权限，修改admins_permission
 function applyPermission() {
     $.ajax({
@@ -471,6 +515,7 @@ function applyPermission() {
         }
     });
 }
+
 // 报错提示
 function Oops(info) {
     swal({

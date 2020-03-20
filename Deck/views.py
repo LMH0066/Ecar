@@ -70,16 +70,12 @@ def get_decks(request):
     # 获取该用户创建的所有卡组 creator_decks, admin_decks, staff_decks
     user = User.objects.get(user_name=user_name)
     decks = user.deck_set.all()
-    decks_name = []
-    decks_amount = []
-    decks_review = []
+    my_decks = []
     for deck in decks:
-        decks_name.append(deck.name)
-        decks_amount.append(deck.amount)
         review_nums = deck.need_review_nums - DeckInfo.objects.get(user__user_id=user.user_id,
                                                                    deck__deck_id=deck.deck_id).now_review_nums
-        decks_review.append(review_nums)
-    ret = {'status': True, 'data': {'decks_name': decks_name, 'decks_amount': decks_amount, 'decks_review': decks_review}}
+        my_decks.append({'deck_id': deck.deck_id, 'deck_name': deck.name, 'card_amount': deck.amount, 'review_nums': review_nums})
+    ret = {'status': True, 'data': my_decks}
     return HttpResponse(json.dumps(ret))
 
 
