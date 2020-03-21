@@ -3,15 +3,16 @@
     list-style-type: none;
     padding: 0;
     width: 34em;
-    margin: 10rem auto 5rem;
+    margin: 5rem auto 8rem;
 }
 
 .card {
     width: 100%;
+    min-height: 300px;
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 2;
+    z-index: 6;
     border-radius: 30px;
     -webkit-transform: translateY(0) rotate(4deg) translateX(25px) scale(1);
     transform: translateY(0) rotate(4deg) translateX(25px) scale(1);
@@ -24,19 +25,51 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    overflow: hidden;
 }
 
+/*卡片翻转效果*/
 .card-front,
 .card-back {
+    transition: all .8s ease;
+    position: absolute;
     background: #ccc;
     border-radius: 30px;
     padding: 40px;
     box-shadow: 0 0 40px #000;
-    overflow: hidden;
-    -webkit-backface-visibility: hidden;
+    width: 100%;
+    height: 100%;
+
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden; /* Chrome 和 Safari */
+    -moz-backface-visibility: hidden; /* Firefox */
+    -ms-backface-visibility: hidden; /* Internet Explorer */
     justify-content: center;
     align-items: center;
+}
+
+.card-front {
+    transform: rotateY(0deg);
+    -webkit-transform: rotateY(0deg); /* Chrome and Safari */
+    -moz-transform: rotateY(0deg); /* Firefox */
+}
+
+.card-back {
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg); /* Chrome and Safari */
+    -moz-transform: rotateY(180deg); /* Firefox */
+}
+
+.card--current .showBack {
+    transform: rotateY(-180deg);
+    -webkit-transform: rotateY(-180deg); /* Chrome and Safari */
+    -moz-transform: rotateY(-180deg); /* Firefox */
+}
+
+.card--current .showFront {
+    transform: rotateY(0);
+    -webkit-transform: rotateY(0); /* Chrome and Safari */
+    -moz-transform: rotateY(0); /* Firefox */
 }
 
 .card :last-child {
@@ -44,7 +77,7 @@
 }
 
 .card--next {
-    z-index: 5;
+    z-index: 8;
     -webkit-transform: translateY(-25px) rotate(4deg) translateX(25px) scale(1);
     transform: translateY(-25px) rotate(4deg) translateX(25px) scale(1);
 }
@@ -54,7 +87,7 @@
     animation: card-out 0.6s cubic-bezier(0.8, 0.2, 0.1, 0.8);
     -webkit-transform: translateY(-50px) rotate(8deg) translateX(55px) scale(0.95);
     transform: translateY(-50px) rotate(8deg) translateX(55px) scale(0.95);
-    z-index: 1;
+    z-index: 5;
     background: #bbb;
 }
 
@@ -69,7 +102,7 @@
         transform: translateY(-120%) rotate(-5deg) translateX(-40px);
     }
     80% {
-        z-index: 1;
+        z-index: 5;
     }
     100% {
         -webkit-transform: translateY(-50px) rotate(8deg) translateX(55px) scale(0.95);
@@ -88,7 +121,7 @@
         transform: translateY(-120%) rotate(-5deg) translateX(-40px);
     }
     80% {
-        z-index: 1;
+        z-index: 5;
     }
     100% {
         -webkit-transform: translateY(-50px) rotate(8deg) translateX(55px) scale(0.95);
@@ -105,9 +138,10 @@
     position: relative;
     z-index: 10;
     opacity: 1;
-    background: #EEE;
+    background: transparent;
     -webkit-transform: rotate(-1deg) translateX(0%) scale(1);
     transform: rotate(-1deg) translateX(0%) scale(1);
+    border: none;
 }
 
 #content {
