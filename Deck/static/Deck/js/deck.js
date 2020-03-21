@@ -173,14 +173,16 @@ function addDeck(deck_id, deck_name, amount, need_review_amout) {
         "                          <p>" + amount + " cards(" + need_review_amout + ")</p>" +
         "                          <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' onclick='deleteDeck(this)'" +
         "                          viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' " +
-        "                          stroke-linecap='round' stroke-linejoin='round' class='deck-option'>" +
+        "                          stroke-linecap='round' stroke-linejoin='round' class='deck-option bs-popover rounded'" +
+        "                          data-content='Delete'>" +
         "                              <polyline points='3 6 5 6 21 6'></polyline>" +
         "                              <path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'></path>" +
         "                              <line x1='10' y1='11' x2='10' y2='17'></line>" +
         "                              <line x1='14' y1='11' x2='14' y2='17'></line></svg>" +
         "                          <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' onclick='reviewDeck(this)'" +
         "                          viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' " +
-        "                          stroke-linecap='round' stroke-linejoin='round' class='deck-option'>" +
+        "                          stroke-linecap='round' stroke-linejoin='round' class='deck-option bs-popover rounded'" +
+        "                          data-content='Review'>" +
         "                              <path d='M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z'></path>" +
         "                              <path d='M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'></path></svg>" +
         "                        </div>" +
@@ -192,6 +194,11 @@ function addDeck(deck_id, deck_name, amount, need_review_amout) {
     let card = findCardSelector(deck_name);
     for (let i = 0; i < amount - 1 && 5; i++)
         card.append($("<div class='child'></div>"));
+    $('.deck-option').popover({
+        template: '<div class="popover popover-danger" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
+        trigger: 'hover',
+        placement: 'top'
+    });
 }
 
 // 删除卡组
