@@ -27,6 +27,19 @@ $.fn.commentCards = function () {
 };
 
 function keyMonitor() {
+    // let count;
+    // if (count > 0) {
+    //     console.log("太快");
+    //     return;
+    // }
+    // let timer = setInterval(function () {
+    //     if (count > 0) {
+    //         count = count - 1;
+    //     } else {
+    //         count = 60;
+    //         clearInterval(timer)
+    //     }
+    // }, 1000);
     if (event.keyCode === 32) {
         let $card_current = $('.card--current');
         if ($card_current.children('.card-front').hasClass('showBack')) {

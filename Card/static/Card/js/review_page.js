@@ -14,7 +14,18 @@ $(function () {
         "                     </div>" +
         "                 </li>"));
     $('.cards').commentCards();
+    let key_flag = false, is_key_down = false;
     document.onkeydown = function () {
-        keyMonitor()
+        if (key_flag || is_key_down)
+            return;
+        is_key_down = true;
+        keyMonitor();
+        key_flag = true;
+        setTimeout(function () {
+            is_key_down = false;
+        }, 800);       //一秒内不能重复点击
+    };
+    document.onkeyup = function () {
+        key_flag = false;
     };
 });
