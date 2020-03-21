@@ -14,10 +14,27 @@ $.fn.commentCards = function () {
                 $next.addClass('card--next');
             }
         });
-        if (!$current.length) {
+        if ($cards.length === 1) {
+            $current = $next = $cards.first();
+            $current.addClass('card--current');
+            $current.addClass('card--next');
+        } else {
             $current = $cards.last();
             $cards.first().trigger('click');
         }
         $this.addClass('cards--active');
     })
 };
+
+function keyMonitor() {
+    if (event.keyCode === 32) {
+        let $card_current = $('.card--current');
+        if ($card_current.children('.card-front').hasClass('showBack')) {
+            $card_current.children('.card-front').removeClass('showBack');
+            $card_current.children('.card-back').removeClass('showFront');
+        } else {
+            $card_current.children('.card-front').addClass('showBack');
+            $card_current.children('.card-back').addClass('showFront');
+        }
+    }
+}

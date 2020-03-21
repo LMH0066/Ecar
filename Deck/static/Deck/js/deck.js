@@ -291,10 +291,14 @@ function reviewDeck(svg) {
                             "                    <br/>" +
                             "                    <h3>" + fields["q_text"] + "</h3>" +
                             "                </div>" +
-                            "            </li>"))
+                            "                <div class='card-back'>" +
+                            "                    <h1>Review Card " + (i + 1) + " </h1>" +
+                            "                    <br/>" +
+                            "                    <h3>" + fields["ans_text"] + "</h3>" +
+                            "                </div>" +
+                            "            </li>"));
                     }
                     $cards.commentCards();
-                    // reviewWindow.console.log($cards);
                 } else {
                     Oops(ret.data);
                 }
