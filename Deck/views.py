@@ -89,7 +89,7 @@ def set_need_review_nums(request):
     ret = {'status': True}
     if new_nums <= max_nums:
         if new_nums < max_nums:
-            deck.amount = new_nums
+            deck.need_review_nums = new_nums
             deck.save()
     else:
         ret['status'] = False
