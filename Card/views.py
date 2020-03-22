@@ -185,10 +185,9 @@ def forget_card(request):
 
 @csrf_exempt
 def remember_card(request):
-    front_text = request.POST.get('front_text')
     user_name = request.session['username']
     deck_id = request.session['deck_id']
-    memory_info = MemoryInfo.objects.get(card__q_text=front_text, user_name=user_name)
+    memory_info = MemoryInfo.objects.get(card_id=request.POST.get('card_id'), user_name=user_name)
     memory_info.now_correct_times += 1
     if memory_info.now_correct_times >= memory_info.need_correct_times:
         deck_info = DeckInfo.objects.get(user_name=user_name, deck_id=deck_id)
