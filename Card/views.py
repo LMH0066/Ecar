@@ -87,9 +87,15 @@ def remove_card(request):
     if (user.user_id == card.deck.creator.user_id or
             user in card.deck.admins.all()):
         Card.objects.filter(card_id=card.card_id).delete()
-        deck.amount = deck.amount - 1
-        deck.save()
-        ret['data'] = {'deck_name': deck.name, 'card_amount': deck.amount}
+        if deck.amount > 1:
+            if deck.need_review_nums >= deck.amount:
+                deck.need_review_nums = deck.amount - 1;
+            deck.amount -= 1
+            deck.save()
+            ret['data'] = {'deck_name': deck.name, 'card_amount': deck.amount}
+        else:
+            ret['status'] = False
+            ret['data'] = 'No Card To Remove'
     else:
         ret['status'] = False
         ret['data'] = 'Insufficient permissions'
@@ -137,6 +143,10 @@ def get_memory_card(request):
     user_name = request.session['username']
     deck_id = request.POST.get('deck_id')
     deck = Deck.objects.get(deck_id=deck_id)
+    if deck.amount == 0:
+        ret['status'] = False
+        ret['data'] = "Deck have no card"
+        return HttpResponse(json.dumps(ret))
     review_nums = deck.need_review_nums - DeckInfo.objects.get(user__user_name=user_name,
                                                                deck__deck_id=deck_id).now_review_nums
     infos = MemoryInfo.objects.filter(user__user_name=user_name,
@@ -186,8 +196,9 @@ def forget_card(request):
 @csrf_exempt
 def remember_card(request):
     user_name = request.session['username']
-    deck_id = request.session['deck_id']
-    memory_info = MemoryInfo.objects.get(card_id=request.POST.get('card_id'), user_name=user_name)
+    card_id = request.POST.get('card_id')
+    memory_info = MemoryInfo.objects.get(card_id=card_id, user_name=user_name)
+    deck_id = Deck.objects.get(card__card_id=card_id).deck_id
     memory_info.now_correct_times += 1
     if memory_info.now_correct_times >= memory_info.need_correct_times:
         deck_info = DeckInfo.objects.get(user_name=user_name, deck_id=deck_id)

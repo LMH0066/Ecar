@@ -74,8 +74,26 @@ def get_decks(request):
     for deck in decks:
         review_nums = deck.need_review_nums - DeckInfo.objects.get(user__user_id=user.user_id,
                                                                    deck__deck_id=deck.deck_id).now_review_nums
-        my_decks.append({'deck_id': deck.deck_id, 'deck_name': deck.name, 'card_amount': deck.amount, 'review_nums': review_nums})
+        my_decks.append(
+            {'deck_id': deck.deck_id, 'deck_name': deck.name, 'card_amount': deck.amount, 'review_nums': review_nums})
     ret = {'status': True, 'data': my_decks}
+    return HttpResponse(json.dumps(ret))
+
+
+# 修改卡组每日记忆数
+@csrf_exempt
+def set_need_review_nums(request):
+    deck = Deck.objects.get(deck_id=request.session['deck_id'])
+    new_nums = request.POST.get('review_nums')
+    max_nums = deck.amount
+    ret = {'status': True}
+    if new_nums <= max_nums:
+        if new_nums < max_nums:
+            deck.amount = new_nums
+            deck.save()
+    else:
+        ret['status'] = False
+        ret['data'] = "Review nums greater than deck amount"
     return HttpResponse(json.dumps(ret))
 
 

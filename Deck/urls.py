@@ -7,4 +7,5 @@ urlpatterns = [
     path('ShowDecks', views.get_decks),
     path('CreateDeck', views.create_deck),
     path('DeleteDeck', views.delete_deck),
+    path('SetReviewNums', views.set_need_review_nums)
 ]
