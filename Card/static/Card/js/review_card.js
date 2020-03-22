@@ -27,20 +27,10 @@ $.fn.commentCards = function () {
 };
 
 function keyMonitor() {
-    // let count;
-    // if (count > 0) {
-    //     console.log("太快");
-    //     return;
-    // }
-    // let timer = setInterval(function () {
-    //     if (count > 0) {
-    //         count = count - 1;
-    //     } else {
-    //         count = 60;
-    //         clearInterval(timer)
-    //     }
-    // }, 1000);
+    let $progress_bar = $("#countdown");
+    let time = $progress_bar.getRemainingTime();
     if (event.keyCode === 32) {
+        // 按空格键
         let $card_current = $('.card--current');
         if ($card_current.children('.card-front').hasClass('showBack')) {
             $card_current.children('.card-front').removeClass('showBack');
@@ -49,5 +39,42 @@ function keyMonitor() {
             $card_current.children('.card-front').addClass('showBack');
             $card_current.children('.card-back').addClass('showFront');
         }
+    } else if (event.keyCode === 37) {
+        // 按左键
+        $progress_bar.reset();
+    } else if (event.keyCode === 39) {
+        // 按右键
+        $progress_bar.reset();
     }
+}
+
+function memoryRecord(card_id) {
+    let form_data = new FormData();
+    form_data.append('card_id', card_id);
+    $.ajax({
+        url: "/card/RemoveCard",
+        type: "POST",
+        data: form_data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function (ret) {
+            if (ret.status) {
+                // $(svg).parents('tr').remove();
+                let table = $('#card-table').DataTable();
+                table.row($(svg).parents('tr')).remove().draw();
+                let card = findCardSelector(ret.data.deck_name);
+                if (ret.data.card_amount > 0)
+                    card.children("div:last").remove();
+                let p = card.children().children('p');
+                p.text(ret.data.card_amount + " cards");
+            } else {
+                Oops(ret.data);
+            }
+        },
+        error: function () {
+            Oops("");
+        }
+    })
 }

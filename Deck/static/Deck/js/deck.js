@@ -285,7 +285,7 @@ function reviewDeck(svg) {
                     let $cards = reviewWindow.$('.cards');
                     for (let i = 0; i < ret["data"].length; i++) {
                         let fields = ret["data"][i]["fields"];
-                        $cards.append($("<li class='card'>" +
+                        $cards.append($("<li class='card' id='" + ret["data"][i]["pk"] + "'>" +
                             "                <div class='card-front'>" +
                             "                    <h1>Review Card " + (i + 1) + " </h1>" +
                             "                    <br/>" +
@@ -299,6 +299,7 @@ function reviewDeck(svg) {
                             "            </li>"));
                     }
                     $cards.commentCards();
+                    reviewWindow.console.log(ret["data"]);
                 } else {
                     Oops(ret.data);
                 }

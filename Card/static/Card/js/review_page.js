@@ -14,6 +14,7 @@ $(function () {
         "                     </div>" +
         "                 </li>"));
     $('.cards').commentCards();
+
     let key_flag = false, is_key_down = false;
     document.onkeydown = function () {
         if (key_flag || is_key_down)
@@ -28,4 +29,17 @@ $(function () {
     document.onkeyup = function () {
         key_flag = false;
     };
+
+    $("#countdown").progressBarTimer({
+        timeLimit: 8, //total number of actual seconds
+        warningThreshold: 2, //seconds remaining triggering switch to warning color
+        autoStart: false, // start the countdown automatically
+        onFinish: function () {
+            console.log("complete")
+        }, //invoked once the timer expires
+        baseStyle: '', //bootstrap progress bar style at the beginning of the timer
+        warningStyle: 'bg-danger', //bootstrap progress bar style in the warning phase
+        smooth: true, // should the timer be smooth or stepping
+        completeStyle: 'bg-danger' //bootstrap progress bar style at completion of timer
+    }).start()
 });
