@@ -32,13 +32,16 @@ $.fn.commentCards = function () {
 };
 
 
-function reviewNext($cards, $next) {
+function reviewNext($cards, $current, $next) {
     if ($cards.length === 1) {
         swal({
             type: 'success',
             title: 'End of the review...',
             padding: '2em'
         });
+        if ($current.attr('id')) {
+            memoryRecord($current.attr('id'), "RememberCard");
+        }
         return false;
     }
     $next = $next.length ? $next : $cards.first();
@@ -50,11 +53,11 @@ function keyMonitor($progress_bar) {
     let $cards = $('.cards').find('.card'),
         $current = $cards.filter('.card--current'),
         $next = $current.next();
-    let time = $progress_bar.progressBarTimer().getRemainingTime();
+    // let time = $progress_bar.progressBarTimer().getRemainingTime();
 
     if (!review_start) {
         review_start = true;
-        if (reviewNext($cards, $next)) {
+        if (reviewNext($cards, $current, $next)) {
             $progress_bar.progressBarTimer().start();
             setTimeout(function () {
                 $current.remove();
@@ -77,14 +80,14 @@ function keyMonitor($progress_bar) {
     } else if (event.keyCode === 37) {
         // 按左键
         $progress_bar.progressBarTimer().reset();
-        if (reviewNext($cards, $next)) {
+        if (reviewNext($cards, $current, $next)) {
             $progress_bar.progressBarTimer().start();
             memoryRecord($current.attr('id'), "ForgetCard");
         }
     } else if (event.keyCode === 39) {
         // 按右键
         $progress_bar.progressBarTimer().reset();
-        if (reviewNext($cards, $next)) {
+        if (reviewNext($cards, $current, $next)) {
             $progress_bar.progressBarTimer().start();
             memoryRecord($current.attr('id'), "RememberCard")
         }

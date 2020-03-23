@@ -299,7 +299,7 @@ function reviewDeck(svg) {
                             "            </li>"));
                     }
                     $cards.commentCards();
-                    reviewWindow.console.log(ret["data"]);
+                    // reviewWindow.console.log(ret["data"]);
                 } else {
                     Oops(ret.data);
                 }
@@ -456,6 +456,7 @@ function showDecks() {
                 for (let i = 0; i < data.length; i++) {
                     addDeck(data[i].deck_id, data[i].deck_name, data[i].card_amount, data[i].review_nums);
                 }
+                setInterval(updateDeck, 500);
             } else {
                 swal({
                     type: 'error',
@@ -506,6 +507,27 @@ function showCards(deck_name) {
         error: function () {
             table.clear().draw();
             Oops("");
+        }
+    })
+}
+
+function updateDeck() {
+    $.ajax({
+        url: "/deck/ShowDecks",
+        type: "POST",
+        cache: false,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function (result) {
+            if (result.status) {
+                let data = result.data,
+                    $container = $('.deck-container');
+                for (let i = 0; i < data.length; i++) {
+                    let $deck = $container.find('.child[id=' + data[i]['deck_id'] + ']');
+                    $deck.children('p').text(data[i]['card_amount'] + " cards(" + data[i]['review_nums'] + ")");
+                }
+            }
         }
     })
 }

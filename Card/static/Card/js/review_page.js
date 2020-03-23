@@ -20,7 +20,15 @@ $(function () {
         warningThreshold: 2, //seconds remaining triggering switch to warning color
         autoStart: false, // start the countdown automatically
         onFinish: function () {
-            console.log("complete")
+            $("#countdown").progressBarTimer().stop();
+            let $card_current = $('.card--current');
+            if ($card_current.children('.card-front').hasClass('showBack')) {
+                $card_current.children('.card-front').removeClass('showBack');
+                $card_current.children('.card-back').removeClass('showFront');
+            } else {
+                $card_current.children('.card-front').addClass('showBack');
+                $card_current.children('.card-back').addClass('showFront');
+            }
         }, //invoked once the timer expires
         baseStyle: '', //bootstrap progress bar style at the beginning of the timer
         warningStyle: 'bg-danger', //bootstrap progress bar style in the warning phase

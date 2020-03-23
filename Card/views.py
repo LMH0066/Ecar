@@ -201,7 +201,6 @@ def remember_card(request):
     memory_info = MemoryInfo.objects.get(card_id=card_id, user__user_name=user_name)
     deck_id = Deck.objects.get(card__card_id=card_id).deck_id
     memory_info.now_correct_times += 1
-    print(memory_info.now_correct_times)
     if memory_info.now_correct_times >= memory_info.need_correct_times:
         deck_info = DeckInfo.objects.get(user__user_name=user_name, deck_id=deck_id)
         # 清零
