@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from django.core import serializers
@@ -7,6 +8,7 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
+from Card.models import MemoryInfo
 from Deck.models import Deck, DeckInfo
 from Login.models import User
 
@@ -73,8 +75,12 @@ def get_decks(request):
     decks = user.deck_set.all()
     my_decks = []
     for deck in decks:
-        review_nums = deck.need_review_nums - DeckInfo.objects.get(user__user_id=user.user_id,
-                                                                   deck__deck_id=deck.deck_id).now_review_nums
+        review_nums = MemoryInfo.objects.filter(user__user_name=user_name,
+                                                card__deck__deck_id=deck.deck_id,
+                                                review_time__lte=datetime.date.today(),
+                                                memory_times__gt=0).count()
+        review_nums += deck.need_review_nums - DeckInfo.objects.get(user__user_id=user.user_id,
+                                                                    deck__deck_id=deck.deck_id).now_review_nums
         my_decks.append(
             {'deck_id': deck.deck_id, 'deck_name': deck.name, 'card_amount': deck.amount, 'review_nums': review_nums})
     ret = {'status': True, 'data': my_decks}
