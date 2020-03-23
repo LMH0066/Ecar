@@ -58,6 +58,7 @@ def create_deck(request):
     new_deck.save()
     new_deck_info = DeckInfo(deck=new_deck, user=user)
     new_deck_info.save()
+    ret['data'] = new_deck.deck_id
     return HttpResponse(json.dumps(ret))
 
 

@@ -123,6 +123,8 @@
             --this.remainingTicks;
             if (this._getSecondsFromTicks(this.remainingTicks) <= this.settings.warningThreshold && !bar.hasClass(this.settings.warningStyle)) {
                 bar.removeClass(this.settings.baseStyle).addClass(this.settings.warningStyle);
+            } else if (this._getSecondsFromTicks(this.remainingTicks) > this.settings.warningThreshold && bar.hasClass(this.settings.warningStyle)) {
+                bar.removeClass(this.settings.warningStyle).addClass(this.settings.baseStyle);
             }
             if (this.remainingTicks === 0) {
                 this.stop();

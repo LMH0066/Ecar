@@ -15,21 +15,6 @@ $(function () {
         "                 </li>"));
     $('.cards').commentCards();
 
-    let key_flag = false, is_key_down = false;
-    document.onkeydown = function () {
-        if (key_flag || is_key_down)
-            return;
-        is_key_down = true;
-        keyMonitor();
-        key_flag = true;
-        setTimeout(function () {
-            is_key_down = false;
-        }, 800);       //一秒内不能重复点击
-    };
-    document.onkeyup = function () {
-        key_flag = false;
-    };
-
     $("#countdown").progressBarTimer({
         timeLimit: 8, //total number of actual seconds
         warningThreshold: 2, //seconds remaining triggering switch to warning color
@@ -41,5 +26,20 @@ $(function () {
         warningStyle: 'bg-danger', //bootstrap progress bar style in the warning phase
         smooth: true, // should the timer be smooth or stepping
         completeStyle: 'bg-danger' //bootstrap progress bar style at completion of timer
-    }).start()
+    });
+
+    let key_flag = false, is_key_down = false;
+    document.onkeydown = function () {
+        if (key_flag || is_key_down)
+            return;
+        is_key_down = true;
+        keyMonitor($("#countdown"));
+        key_flag = true;
+        setTimeout(function () {
+            is_key_down = false;
+        }, 800);       //一秒内不能重复点击
+    };
+    document.onkeyup = function () {
+        key_flag = false;
+    };
 });

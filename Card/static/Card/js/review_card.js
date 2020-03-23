@@ -1,3 +1,4 @@
+let review_start = false;
 $.fn.commentCards = function () {
     return this.each(function () {
         let $this = $(this),
@@ -5,6 +6,10 @@ $.fn.commentCards = function () {
             $current = $cards.filter('.card--current'),
             $next;
         $cards.on('click', function () {
+            if (review_start) {
+                $cards = $this.find('.card');
+                $current = $cards.filter('.card--current');
+            }
             if (!$current.is(this)) {
                 $cards.removeClass('card--current card--out card--next');
                 $current.addClass('card--out');
@@ -26,11 +31,41 @@ $.fn.commentCards = function () {
     })
 };
 
-function keyMonitor() {
-    let $progress_bar = $("#countdown");
-    let time = $progress_bar.getRemainingTime();
+
+function reviewNext($cards, $next) {
+    if ($cards.length === 1) {
+        swal({
+            type: 'success',
+            title: 'End of the review...',
+            padding: '2em'
+        });
+        return false;
+    }
+    $next = $next.length ? $next : $cards.first();
+    $next.trigger('click');
+    return true;
+}
+
+function keyMonitor($progress_bar) {
+    let $cards = $('.cards').find('.card'),
+        $current = $cards.filter('.card--current'),
+        $next = $current.next();
+    let time = $progress_bar.progressBarTimer().getRemainingTime();
+
+    if (!review_start) {
+        review_start = true;
+        if (reviewNext($cards, $next)) {
+            $progress_bar.progressBarTimer().start();
+            setTimeout(function () {
+                $current.remove();
+            }, 700);
+        }
+        return;
+    }
+
     if (event.keyCode === 32) {
         // 按空格键
+        $progress_bar.progressBarTimer().stop();
         let $card_current = $('.card--current');
         if ($card_current.children('.card-front').hasClass('showBack')) {
             $card_current.children('.card-front').removeClass('showBack');
@@ -41,18 +76,26 @@ function keyMonitor() {
         }
     } else if (event.keyCode === 37) {
         // 按左键
-        $progress_bar.reset();
+        $progress_bar.progressBarTimer().reset();
+        if (reviewNext($cards, $next)) {
+            $progress_bar.progressBarTimer().start();
+            memoryRecord($current.attr('id'), "ForgetCard");
+        }
     } else if (event.keyCode === 39) {
         // 按右键
-        $progress_bar.reset();
+        $progress_bar.progressBarTimer().reset();
+        if (reviewNext($cards, $next)) {
+            $progress_bar.progressBarTimer().start();
+            memoryRecord($current.attr('id'), "RememberCard")
+        }
     }
 }
 
-function memoryRecord(card_id) {
+function memoryRecord(card_id, behavior) {
     let form_data = new FormData();
     form_data.append('card_id', card_id);
     $.ajax({
-        url: "/card/RemoveCard",
+        url: "/card/" + behavior,
         type: "POST",
         data: form_data,
         cache: false,
@@ -61,16 +104,10 @@ function memoryRecord(card_id) {
         dataType: "json",
         success: function (ret) {
             if (ret.status) {
-                // $(svg).parents('tr').remove();
-                let table = $('#card-table').DataTable();
-                table.row($(svg).parents('tr')).remove().draw();
-                let card = findCardSelector(ret.data.deck_name);
-                if (ret.data.card_amount > 0)
-                    card.children("div:last").remove();
-                let p = card.children().children('p');
-                p.text(ret.data.card_amount + " cards");
-            } else {
-                Oops(ret.data);
+                let $card = $('.cards').find('.card[id=' + card_id + ']');
+                setTimeout(function () {
+                    $card.remove();
+                }, 700);
             }
         },
         error: function () {

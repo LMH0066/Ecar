@@ -78,7 +78,7 @@ $('#btn-add-deck').on('click', function () {
                 success: function (ret) {
                     if (ret.status) {
                         swal("Good job!", "Successfully add!", "success");
-                        addDeck(result.value, 0, 0);
+                        addDeck(ret.data, result.value, 0);
                     } else {
                         Oops(ret.data);
                     }

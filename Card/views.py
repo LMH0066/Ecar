@@ -186,22 +186,24 @@ def get_memory_card(request):
 @csrf_exempt
 def forget_card(request):
     user_name = request.session['username']
-    memory_info = MemoryInfo.objects.get(card_id=request.POST.get('card_id'), user_name=user_name)
+    memory_info = MemoryInfo.objects.get(card_id=request.POST.get('card_id'), user__user_name=user_name)
     memory_info.now_correct_times = 0
     memory_info.now_error_times += 1
     memory_info.save()
-    return HttpResponse(json.dumps({'status': True}))
+    # 返回false, 表示这个词还没复习结束
+    return HttpResponse(json.dumps({'status': False}))
 
 
 @csrf_exempt
 def remember_card(request):
     user_name = request.session['username']
     card_id = request.POST.get('card_id')
-    memory_info = MemoryInfo.objects.get(card_id=card_id, user_name=user_name)
+    memory_info = MemoryInfo.objects.get(card_id=card_id, user__user_name=user_name)
     deck_id = Deck.objects.get(card__card_id=card_id).deck_id
     memory_info.now_correct_times += 1
+    print(memory_info.now_correct_times)
     if memory_info.now_correct_times >= memory_info.need_correct_times:
-        deck_info = DeckInfo.objects.get(user_name=user_name, deck_id=deck_id)
+        deck_info = DeckInfo.objects.get(user__user_name=user_name, deck_id=deck_id)
         # 清零
         memory_info.now_correct_times = 0
         memory_info.last_memory_time = datetime.date.today()
@@ -218,5 +220,9 @@ def remember_card(request):
             memory_info.memory_times += 1
             deck_info.memory_count += 1
         deck_info.save()
+        memory_info.save()
+        # 返回true, 表示这个词今天复习结束
+        return HttpResponse(json.dumps({'status': True}))
     memory_info.save()
-    return HttpResponse(json.dumps({'status': True}))
+    # 返回false, 表示这个词还没复习结束
+    return HttpResponse(json.dumps({'status': False}))
