@@ -53,9 +53,10 @@ $('#btn-add-deck').on('click', function () {
     swal({
         title: "Add Deck",
         html: "Please input deck name or link" +
-            "<input class='swal2-input' placeholder='' type='text' style='display: flex;'>" +
+            "<input id='deck-info1' class='swal2-input' placeholder='DeckName OR ShareCode' type='text' style='display: flex;'>" +
+            "<input id='deck-info2' class='swal2-input' placeholder='SharePassword' type='text' style='display: none;'>" +
             "<div class='custom-control custom-checkbox'>" +
-            "    <input type='checkbox' class='custom-control-input' id='customCheck'>" +
+            "    <input type='checkbox' class='custom-control-input' id='customCheck' onclick='showDeckInfo()'>" +
             "    <label class='custom-control-label' for='customCheck'>Is Link</label>" +
             "</div>",
         showCancelButton: true,
@@ -63,13 +64,24 @@ $('#btn-add-deck').on('click', function () {
         closeOnConfirm: false,
         padding: '2em',
     }).then(function (result) {
-        let deck_name = $('.swal2-input').val();
+        let deck_info1 = $('#deck-info1').val(),
+            deck_info2 = $('#deck-info2').val();
         let create_by_link = $('.custom-control-input').is(':checked');
-        if (result.value && deck_name !== "") {
-            createDeck(create_by_link, deck_name);
+        if (result.value) {
+            createDeck(create_by_link, deck_info1, deck_info2);
         }
     });
 });
+
+//实现点击id为customCheck的checkbox时，输入框的变化
+function showDeckInfo() {
+    let create_by_link = $('.custom-control-input').is(':checked');
+    if (create_by_link) {
+        $('#deck-info2').show();
+    } else {
+        $('#deck-info2').hide();
+    }
+};
 // 点击添加卡片的按钮后
 $('#btn-add-card').on('click', function () {
     let form_data = new FormData();
@@ -168,6 +180,13 @@ function addDeck(deck_id, deck_name, amount, need_review_amout) {
         "                          data-content='Review'>" +
         "                              <path d='M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z'></path>" +
         "                              <path d='M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'></path></svg>" +
+        "                          <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' onclick='shareDeck(this)'" +
+        "                          viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' " +
+        "                          stroke-linecap='round' stroke-linejoin='round' class='deck-option bs-popover rounded'" +
+        "                          data-content='Share'>" +
+        "                            <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>" +
+        "                            <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>" +
+        "                          </svg>" +
         "                        </div>" +
         "                    </div>" +
         "              </div>"
@@ -175,7 +194,7 @@ function addDeck(deck_id, deck_name, amount, need_review_amout) {
     $('.deck-container').append(deck_html);
     //精确查找到所在卡组
     let card = findCardSelector(deck_name);
-    for (let i = 0; i < show_amount; i++)
+    for (let i = 0; i < show_amount - 1; i++)
         card.append($("<div class='child'></div>"));
     $('.deck-option').popover({
         template: '<div class="popover popover-danger" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
@@ -185,15 +204,16 @@ function addDeck(deck_id, deck_name, amount, need_review_amout) {
 }
 
 // 创建卡组
-function createDeck(create_by_link, deck_info) {
+function createDeck(create_by_link, deck_info1, deck_info2) {
     let form_data = new FormData(),
         url;
     if (create_by_link) {
-        form_data.append('deck_link', deck_info);
-        url = "";
-        return;
+        form_data.append('share_code', deck_info1);
+        form_data.append('share_password', deck_info2);
+        url = "ShareDeck";
     } else {
-        form_data.append('deck_name', deck_info);
+        console.log(deck_info1);
+        form_data.append('deck_name', deck_info1);
         url = "CreateDeck";
     }
     $.ajax({
@@ -473,7 +493,7 @@ function showDecks() {
                 for (let i = 0; i < data.length; i++) {
                     addDeck(data[i].deck_id, data[i].deck_name, data[i].card_amount, data[i].review_nums);
                 }
-                setInterval(updateDeck, 500);
+                setInterval(updateDeck, 1000);
             } else {
                 swal({
                     type: 'error',

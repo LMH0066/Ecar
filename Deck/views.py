@@ -108,13 +108,13 @@ def set_need_review_nums(request):
 # 创建共享邀请码
 @csrf_exempt
 def set_share_code(request):
-    deck = Deck.objects.get(deck_id=request.session['deck_id'])
+    deck = Deck.objects.get(deck_id=request.POST.get('deck_id'))
     password = request.POST.get('share_password')
     code = uuid4()
     new_share_info = ShareInfo(share_code=code, share_password=password, deck=deck)
     new_share_info.save()
     ret = {'status': True,
-           'data': {'share_id': new_share_info.share_id, 'share_code': code, 'share_password': password}}
+           'data': {'share_id': new_share_info.share_id, 'share_code': str(code), 'share_password': password}}
     return HttpResponse(json.dumps(ret))
 
 
@@ -186,6 +186,7 @@ def share_deck(request):
         return HttpResponse(json.dumps(ret))
     deck = share_info.deck
     deck.staffs = user
+    deck.save()
     return HttpResponse(json.dumps(ret))
 
 
