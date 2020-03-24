@@ -47,7 +47,7 @@ class ShareInfo(models.Model):
     # 关联卡组
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE)
     # 创建时间
-    c_time = models.DateTimeField(auto_now_add=True)
+    c_time = models.DateField(auto_now_add=True)
 
 
 class CopyInfo(models.Model):
@@ -57,4 +57,4 @@ class CopyInfo(models.Model):
     # 关联卡组
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE)
     # 创建时间
-    c_time = models.DateTimeField(auto_now_add=True)
+    c_time = models.DateField(auto_now_add=True)

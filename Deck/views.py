@@ -187,6 +187,7 @@ def share_deck(request):
     deck = share_info.deck
     deck.staffs = user
     deck.save()
+    ret['data'] = {'deck_name': deck.name, 'deck_id': deck.deck_id, 'deck_amount': deck.amount}
     return HttpResponse(json.dumps(ret))
 
 
@@ -212,6 +213,7 @@ def copy_deck(request):
         new_card.save()
         new_memory_info = MemoryInfo(card=new_deck, user=user)
         new_memory_info.save()
+    ret['data'] = {'deck_name': new_deck.name, 'deck_id': new_deck.deck_id, 'deck_amount': new_deck.amount}
     return HttpResponse(json.dumps(ret))
 
 
@@ -227,3 +229,15 @@ def get_more_decks(request):
     admin_decks = user.AdminsToDeck.all().difference(creator_decks)
     staff_decks = user.StaffsToDeck.all().difference(admin_decks).difference(creator_decks)
     return HttpResponse(json.dumps({'status': True}))
+
+
+# 定时任务，重设review_nums
+def reset_now_review_nums():
+    MemoryInfo.objects.update(now_review_nums=0)
+
+
+# 定时任务，删除过期邀请码
+def delete_old_code():
+    delete_day = datetime.date.today() - datetime.timedelta(days=3)
+    ShareInfo.objects.filter(c_time__lte=delete_day).delete()
+    CopyInfo.objects.filter(c_time__lte=delete_day).delete()

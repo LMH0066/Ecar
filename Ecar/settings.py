@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_crontab',
     'Login',
     'Home',
     'StudyGroup',
@@ -138,3 +139,8 @@ SESSION_SAVE_EVERY_REQUEST = False
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CRONJOBS = (
+    ('0 0 * * *', 'deck.view.reset_now_review_nums')
+    ('0 0 * * *', 'deck.view.delete_old_code')
+)
