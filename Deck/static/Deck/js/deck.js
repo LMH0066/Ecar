@@ -52,41 +52,21 @@ $('#input-search').on('keyup', function () {
 $('#btn-add-deck').on('click', function () {
     swal({
         title: "Add Deck",
-        text: "name?",
-        input: 'text',
+        html: "Please input deck name or link" +
+            "<input class='swal2-input' placeholder='' type='text' style='display: flex;'>" +
+            "<div class='custom-control custom-checkbox'>" +
+            "    <input type='checkbox' class='custom-control-input' id='customCheck'>" +
+            "    <label class='custom-control-label' for='customCheck'>Is Link</label>" +
+            "</div>",
         showCancelButton: true,
         cancelButtonText: "cancel",
         closeOnConfirm: false,
         padding: '2em',
     }).then(function (result) {
-        if (result.value) {
-            // console.log(result.value.length);
-            // if (result.value.length > 10) {
-            //     Oops("The name is too long");
-            //     return;
-            // }
-            let form_data = new FormData();
-            form_data.append('deck_name', result.value);
-            $.ajax({
-                url: "/deck/CreateDeck",
-                type: "POST",
-                data: form_data,
-                cache: false,
-                contentType: false,
-                processData: false,
-                dataType: "json",
-                success: function (ret) {
-                    if (ret.status) {
-                        swal("Good job!", "Successfully add!", "success");
-                        addDeck(ret.data, result.value, 0);
-                    } else {
-                        Oops(ret.data);
-                    }
-                },
-                error: function () {
-                    Oops("");
-                }
-            })
+        let deck_name = $('.swal2-input').val();
+        let create_by_link = $('.custom-control-input').is(':checked');
+        if (result.value && deck_name !== "") {
+            createDeck(create_by_link, deck_name);
         }
     });
 });
@@ -123,6 +103,8 @@ $('#btn-add-card').on('click', function () {
                     card.append($("<div class='child'></div>"));
                 let p = card.children().children('p');
                 p.text(result.data.card_amount + " cards");
+            } else {
+                Oops(result['data']);
             }
         },
         error: function () {
@@ -162,10 +144,11 @@ $(function () {
     });
 });
 
-// 创建卡组
+// 在页面上添加卡组
 function addDeck(deck_id, deck_name, amount, need_review_amout) {
     let divElement = document.createElement("div");
-    let deck_html = $("<div class='col-xl-3 col-lg-3 col-md-6 col-sm-6 items' style='--cards:" + amount + ";'>" +
+    let show_amount = amount > 4 ? 4 : amount;
+    let deck_html = $("<div class='col-xl-3 col-lg-3 col-md-6 col-sm-6 items' style='--cards:" + show_amount + ";'>" +
         "                  <div class='card'>" +
         "                      <div class='child' data-target='#cardModal' data-toggle='modal' " +
         "                       onclick='showCards(" + deck_name + ")' id='" + deck_id + "'>" +
@@ -192,13 +175,47 @@ function addDeck(deck_id, deck_name, amount, need_review_amout) {
     $('.deck-container').append(deck_html);
     //精确查找到所在卡组
     let card = findCardSelector(deck_name);
-    for (let i = 0; i < amount - 1 && 5; i++)
+    for (let i = 0; i < show_amount; i++)
         card.append($("<div class='child'></div>"));
     $('.deck-option').popover({
         template: '<div class="popover popover-danger" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
         trigger: 'hover',
         placement: 'top'
     });
+}
+
+// 创建卡组
+function createDeck(create_by_link, deck_info) {
+    let form_data = new FormData(),
+        url;
+    if (create_by_link) {
+        form_data.append('deck_link', deck_info);
+        url = "";
+        return;
+    } else {
+        form_data.append('deck_name', deck_info);
+        url = "CreateDeck";
+    }
+    $.ajax({
+        url: "/deck/" + url,
+        type: "POST",
+        data: form_data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function (result) {
+            if (result.status) {
+                swal("Good job!", "Successfully add!", "success");
+                addDeck(result['data']['deck_id'], result['data']['deck_name'], 0);
+            } else {
+                Oops(result['data']);
+            }
+        },
+        error: function () {
+            Oops("");
+        }
+    })
 }
 
 // 删除卡组

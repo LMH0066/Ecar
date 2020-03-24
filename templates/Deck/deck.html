@@ -7,10 +7,16 @@
 {% block page_css %}
     <link href="/static/plugins/sweetalerts/sweetalert2.min.css" rel="stylesheet" type="text/css"/>
     <link href="/static/plugins/sweetalerts/sweetalert.css" rel="stylesheet" type="text/css"/>
+
     <link href="/static/plugins/modal.css" rel="stylesheet" type="text/css"/>
+
     <link href="/static/plugins/datatable/datatables.css" rel="stylesheet" type="text/css"/>
     <link href="/static/plugins/datatable/dt-global_style.css" rel="stylesheet" type="text/css"/>
+
     <link href="/static/plugins/popover/popover.css" rel="stylesheet" type="text/css"/>
+
+    <link href="/static/plugins/snackbar/snackbar.min.css" rel="stylesheet" type="text/css"/>
+
     <link href="/static/Deck/css/deck.css" rel="stylesheet" type="text/css"/>
     <link href="/static/Deck/css/search.css" rel="stylesheet" type="text/css"/>
 {% endblock %}
@@ -48,7 +54,8 @@
                         <svg id="btn-add-deck" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                              stroke-linecap="round" stroke-linejoin="round"
-                             class="bs-popover rounded" data-trigger="hover" data-placement="bottom" data-content="Create Deck">
+                             class="bs-popover rounded" data-trigger="hover" data-placement="bottom"
+                             data-content="Create Deck">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                             <circle cx="8.5" cy="7" r="4"></circle>
                             <line x1="20" y1="8" x2="20" y2="14"></line>
@@ -93,6 +100,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="cardModalCenterTitle"></h5>
+                    <div class="modal-options">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round" class="btn-share-deck">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                    </div>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -139,6 +154,8 @@
 {% block page_js %}
     <script src="/static/plugins/datatable/datatables.js"></script>
     <script src="/static/plugins/sweetalerts/sweetalert2.min.js"></script>
+    <script src="/static/plugins/snackbar/snackbar.min.js"></script>
+    <script src="/static/Deck/js/deck_share.js"></script>
     <script src="/static/Card/js/review_card.js"></script>
     <script src="/static/Deck/js/deck.js"></script>
 {% endblock %}

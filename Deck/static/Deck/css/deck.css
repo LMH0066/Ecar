@@ -185,3 +185,16 @@ h3 {
     white-space: normal !important;
     word-break: break-all;
 }
+
+.btn-share-deck {
+    margin-left: 5rem;
+    color: black !important;
+    margin-right: 6px;
+    vertical-align: middle;
+    fill: rgba(0, 23, 55, 0.08);
+    cursor: pointer;
+}
+
+.btn-share-deck:hover {
+    color: #e7515a !important;
+}
