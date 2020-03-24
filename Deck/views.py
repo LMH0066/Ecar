@@ -8,9 +8,10 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
-from Card.models import MemoryInfo
-from Deck.models import Deck, DeckInfo
+from Card.models import Card, MemoryInfo
+from Deck.models import Deck, DeckInfo, ShareInfo, CopyInfo
 from Login.models import User
+from uuid import uuid4
 
 
 # 访问卡组页面
@@ -101,6 +102,115 @@ def set_need_review_nums(request):
     else:
         ret['status'] = False
         ret['data'] = "Review nums greater than deck amount"
+    return HttpResponse(json.dumps(ret))
+
+
+# 创建共享邀请码
+@csrf_exempt
+def set_share_code(request):
+    deck = Deck.objects.get(deck_id=request.session['deck_id'])
+    password = request.POST.get('share_password')
+    code = uuid4()
+    new_share_info = ShareInfo(share_code=code, share_password=password, deck=deck)
+    new_share_info.save()
+    ret = {'status': True,
+           'data': {'share_id': new_share_info.share_id, 'share_code': code, 'share_password': password}}
+    return HttpResponse(json.dumps(ret))
+
+
+# 创建拷贝邀请码
+@csrf_exempt
+def set_copy_code(request):
+    deck = Deck.objects.get(deck_id=request.session['deck_id'])
+    code = uuid4()
+    new_copy_info = CopyInfo(copy_code=code, deck=deck)
+    new_copy_info.save()
+    ret = {'status': True, 'data': {'copy_id': new_copy_info.copy_code, 'copy_code': code}}
+    return HttpResponse(json.dumps(ret))
+
+
+# 关闭共享邀请码
+@csrf_exempt
+def delete_share_code(request):
+    share_id = request.POST.get('share_id')
+    ShareInfo.objects.filter(share_id=share_id).delete()
+    ret = {'status': True}
+    return HttpResponse(json.dumps(ret))
+
+
+@csrf_exempt
+def delete_copy_code(request):
+    copy_id = request.POST.get('copy_id')
+    CopyInfo.objects.filter(copy_id=copy_id).delete()
+    ret = {'status': True}
+    return HttpResponse(json.dumps(ret))
+
+
+# 查找该卡组所有Share邀请
+@csrf_exempt
+def get_share_codes(request):
+    deck = Deck.objects.get(deck_id=request.session['deck_id'])
+    infos = ShareInfo.objects.get(deck=deck)
+    ret = {'status': True}
+    if infos.exist():
+        ret['data'] = list(infos)
+    else:
+        ret['status'] = False
+    return HttpResponse(json.dumps(ret))
+
+
+# 查找该卡组所有Copy邀请
+@csrf_exempt
+def get_copy_codes(request):
+    deck = Deck.objects.get(deck_id=request.session['deck_id'])
+    infos = CopyInfo.objects.get(deck=deck)
+    ret = {'status': True}
+    if infos.exist():
+        ret['data'] = list(infos)
+    else:
+        ret['status'] = False
+    return HttpResponse(json.dumps(ret))
+
+
+# 使用Share邀请
+@csrf_exempt
+def share_deck(request):
+    user = User.objects.get(user_name=request.session['username'])
+    code = request.POST.get('share_code')
+    password = request.POST.get('share_password')
+    ret = {'status': True}
+    try:
+        share_info = ShareInfo.objects.get(share_code=code, share_password=password)
+    except:
+        ret['status'] = False
+        return HttpResponse(json.dumps(ret))
+    deck = share_info.deck
+    deck.staffs = user
+    return HttpResponse(json.dumps(ret))
+
+
+# 使用Copy邀请
+@csrf_exempt
+def copy_deck(request):
+    user = User.objects.get(user_name=request.session['username'])
+    code = request.POST.get('copy_code')
+    ret = {'status': True}
+    try:
+        copy_info = CopyInfo.objects.get(copy_code=code)
+    except:
+        ret['status'] = False
+        ret['data'] = 'Can not find the deck by code'
+        return HttpResponse(json.dumps(ret))
+    deck = copy_info.deck
+    new_deck = Deck(name=deck.name, amount=deck.amount, creator=user)
+    new_deck.save()
+    cards = Card.objects.filter(deck=deck)
+    for card in cards:
+        new_card = Card(q_text=card.q_text, q_img=card.q_img, ans_text=card.ans_text,
+                        ans_img=card.ans_img, deck=new_deck)
+        new_card.save()
+        new_memory_info = MemoryInfo(card=new_deck, user=user)
+        new_memory_info.save()
     return HttpResponse(json.dumps(ret))
 
 
