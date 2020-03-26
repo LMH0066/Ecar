@@ -141,6 +141,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CRONJOBS = (
-    ('0 0 * * *', 'deck.view.reset_now_review_nums')
-    ('0 0 * * *', 'deck.view.delete_old_code')
+    ('0 0 * * *', 'Deck.views.reset_now_review_nums'),
+    ('0 0 * * *', 'Deck.views.delete_old_code')
 )

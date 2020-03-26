@@ -163,7 +163,7 @@ function addDeck(deck_id, deck_name, amount, need_review_amout) {
     let deck_html = $("<div class='col-xl-3 col-lg-3 col-md-6 col-sm-6 items' style='--cards:" + show_amount + ";'>" +
         "                  <div class='card'>" +
         "                      <div class='child' data-target='#cardModal' data-toggle='modal' " +
-        "                       onclick='showCards(" + deck_name + ")' id='" + deck_id + "'>" +
+        "                       onclick='showCards(" + deck_name + ", " + deck_id + ")' id='" + deck_id + "'>" +
         "                          <h3>" + deck_name + "</h3>" +
         "                          <p>" + amount + " cards(" + need_review_amout + ")</p>" +
         "                          <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' onclick='deleteDeck(this)'" +
@@ -227,7 +227,7 @@ function createDeck(create_by_link, deck_info1, deck_info2) {
         success: function (result) {
             if (result.status) {
                 swal("Good job!", "Successfully add!", "success");
-                addDeck(result['data']['deck_id'], result['data']['deck_name'], 0);
+                addDeck(result['data']['deck_id'], result['data']['deck_name'], result['data']['deck_amount']);
             } else {
                 Oops(result['data']);
             }
@@ -513,11 +513,11 @@ function showDecks() {
 }
 
 // 显示所有卡片
-function showCards(deck_name) {
+function showCards(deck_name, deck_id) {
     card_modifying = false;
     $('#cardModalCenterTitle').html(deck_name);
     let form_data = new FormData();
-    form_data.append('deck_name', deck_name);
+    form_data.append('deck_id', deck_id);
     let table = $('#card-table').DataTable();
     $.ajax({
         url: "/card/ShowCards",
@@ -532,8 +532,8 @@ function showCards(deck_name) {
                 // 卡组有卡片
                 let data = result.data;
                 table.clear();
-                for (let i = 0; i < data.front_text.length; i++) {
-                    table.row.add([data.front_text[i], data.back_text[i], other_options]).draw();
+                for (let i = 0; i < data['front_text'].length; i++) {
+                    table.row.add([data['front_text'][i], data['back_text'][i], other_options]).draw();
                 }
             } else {
                 // 卡组没卡片

@@ -25,9 +25,9 @@ def go_review(request):
 # 通过deck获得相应卡片
 @csrf_exempt
 def get_cards(request):
-    deck_name = request.POST.get('deck_name')
-    user = User.objects.get(user_name=request.session['username'])
-    deck = user.deck_set.get(name=deck_name)
+    deck_id = request.POST.get('deck_id')
+    # user = User.objects.get(user_name=request.session['username'])
+    deck = Deck.objects.get(deck_id=deck_id)
     request.session['deck_id'] = deck.deck_id
     ret = {'status': True}
     if deck.amount == 0:

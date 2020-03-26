@@ -12,6 +12,7 @@ from Card.models import Card, MemoryInfo
 from Deck.models import Deck, DeckInfo, ShareInfo, CopyInfo
 from Login.models import User
 from uuid import uuid4
+from itertools import chain
 
 
 # 访问卡组页面
@@ -61,7 +62,7 @@ def create_deck(request):
     new_deck.save()
     new_deck_info = DeckInfo(deck=new_deck, user=user)
     new_deck_info.save()
-    ret['data'] = {'deck_name': new_deck.name, 'deck_id': new_deck.deck_id}
+    ret['data'] = {'deck_name': new_deck.name, 'deck_id': new_deck.deck_id, 'deck_amount': 0}
     return HttpResponse(json.dumps(ret))
 
 
@@ -73,7 +74,10 @@ def get_decks(request):
     user_name = request.session['username']
     # 获取该用户创建的所有卡组 creator_decks, admin_decks, staff_decks
     user = User.objects.get(user_name=user_name)
-    decks = user.deck_set.all()
+    creator_decks = user.deck_set.all()
+    admin_decks = user.AdminsToDeck.all().difference(creator_decks)
+    staff_decks = user.StaffsToDeck.all().difference(admin_decks).difference(creator_decks)
+    decks = chain(creator_decks, admin_decks, staff_decks)
     my_decks = []
     for deck in decks:
         review_nums = MemoryInfo.objects.filter(user__user_name=user_name,
@@ -185,8 +189,10 @@ def share_deck(request):
         ret['status'] = False
         return HttpResponse(json.dumps(ret))
     deck = share_info.deck
-    deck.staffs = user
+    deck.staffs.add(user)
     deck.save()
+    new_deck_info = DeckInfo(deck=deck, user=user)
+    new_deck_info.save()
     ret['data'] = {'deck_name': deck.name, 'deck_id': deck.deck_id, 'deck_amount': deck.amount}
     return HttpResponse(json.dumps(ret))
 
@@ -206,6 +212,8 @@ def copy_deck(request):
     deck = copy_info.deck
     new_deck = Deck(name=deck.name, amount=deck.amount, creator=user)
     new_deck.save()
+    new_deck_info = DeckInfo(deck=new_deck, user=user)
+    new_deck_info.save()
     cards = Card.objects.filter(deck=deck)
     for card in cards:
         new_card = Card(q_text=card.q_text, q_img=card.q_img, ans_text=card.ans_text,
