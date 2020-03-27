@@ -1,0 +1,15 @@
+.search-input-group-style.input-group {
+    -webkit-box-shadow: 0 0 0 1px rgba(136, 142, 168, 0.3137254901960784);
+    box-shadow: 0 0 0 1px rgba(136, 142, 168, 0.3137254901960784);
+}
+.search-input-group-style.input-group .input-group-prepend .input-group-text {
+    border: 1px solid #ffffff;
+    background-color: #ffffff;
+}
+.search-input-group-style.input-group .input-group-prepend .input-group-text svg { color: #1b55e2; }
+.search-input-group-style input {
+    border: none;
+    border-radius: 4px;
+    padding: 6px 16px;
+    color: #0e1726;
+}
