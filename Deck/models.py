@@ -21,6 +21,8 @@ class Deck(models.Model):
     staffs = models.ManyToManyField(User, related_name='StaffsToDeck')
     # 单次需要复习个数
     need_review_nums = models.IntegerField(default=0)
+    # 是否是public_deck
+    is_public = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u'<%s,%d>' % (self.name, self.deck_id)

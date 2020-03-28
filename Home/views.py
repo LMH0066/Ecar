@@ -23,7 +23,7 @@ def publish_deck(request):
     deck = Deck.objects.get(deck_id=request.session['deck_id'])
     ret = {'status': True}
     # copy卡组信息
-    new_deck = Deck(name=deck.name, amount=deck.amount, creator=deck.creator)
+    new_deck = Deck(name=deck.name, amount=deck.amount, creator=deck.creator, is_public=True)
     new_deck.save()
     cards = Card.objects.filter(deck=deck)
     # copy卡片信息
@@ -32,7 +32,7 @@ def publish_deck(request):
                         ans_img=card.ans_img, deck=new_deck)
         new_card.save()
     # 创建public信息
-    new_public_deck = PublicDecks(deck=deck, author=deck.creator)
+    new_public_deck = PublicDecks(deck_id=new_deck.deck_id, author=deck.creator)
     new_public_deck.save()
     c_time = serializers.serialize("json", new_public_deck.c_time)
     ret['data'] = {'public_deck_id': new_public_deck.public_id, 'star_num': new_public_deck.star_num,
@@ -47,6 +47,7 @@ def publish_deck(request):
 def delete_public_deck(request):
     public_deck = PublicDecks.objects.get(public_id=request.session['public_id'])
     ret = {'status': True}
+    Deck.objects.get(deck_id=public_deck.deck_id).delete()
     public_deck.delete()
     return HttpResponse(json.dump(ret))
 
@@ -58,7 +59,7 @@ def get_author_deck(request):
     author_decks = user.publicdecks_set.all()
     my_decks = []
     for author_deck in author_decks:
-        deck = author_deck.deck
+        deck = Deck.objects.get(deck_id=author_deck.deck_id)
         my_decks.append(
             {'public_deck_id': author_deck.public_id, 'star_num': author_deck.star_num,
              'comment_num': author_deck.comment_num, 'c_time': author_deck.c_time, 'deck_id': deck.deck_id,
@@ -71,7 +72,12 @@ def get_author_deck(request):
 # 查看公共卡组
 @csrf_exempt
 def get_public_deck(request):
-    public_decks = PublicDecks.objects.all()
+    max_size = 400
+    size = PublicDecks.objects.count()
+    if size <= max_size:
+        public_decks = PublicDecks.objects.order_by('star_num')
+    else:
+        public_decks = PublicDecks.objects.order_by('star_num')[:max_size]
     all_decks = []
     for public_deck in public_decks:
         deck = public_deck.deck
@@ -81,8 +87,30 @@ def get_public_deck(request):
              'comment_num': public_deck.comment_num, 'c_time': public_deck.c_time, 'deck_id': deck.deck_id,
              'deck_name': deck.name,
              'card_amount': deck.amount,
-             'deck_author': user.user_name})
+             'deck_author': user.user_name,
+             'deck_author_avatar': user.avatar})
     ret = {'status': True, 'data': all_decks}
+    return HttpResponse(json.dumps(ret))
+
+
+@csrf_exempt
+def show_public_deck(request):
+    public_id = request.POST.get('public_id')
+    request.session['public_id'] = public_id
+    ret = {'status': True}
+    comments = Comment.objects.filter(public_deck__public_id=public_id).order_by('c_time')
+    if comments.exists():
+        all_comments = []
+        for comment in comments:
+            user = comment.user
+            all_comments.append(
+                {'user_name': user.user_name, 'user_avatar': user.avatar, 'content': comment.content,
+                 'c_time': comment.c_time}
+            )
+            ret['data'] = all_comments
+    else:
+        ret['status'] = False
+        ret['data'] = 'No Comments'
     return HttpResponse(json.dumps(ret))
 
 

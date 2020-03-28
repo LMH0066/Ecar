@@ -75,11 +75,11 @@ def get_decks(request):
     # 获取该用户创建的所有卡组 creator_decks, admin_decks, staff_decks
     user = User.objects.get(user_name=user_name)
     # public_decks = user.publicdecks_set.all()
-    creator_decks = user.deck_set.all()
+    creator_decks = user.deck_set.filter(is_public=False)
     # if public_decks.exists():
     #     creator_decks = creator_decks.difference(public_decks)
-    admin_decks = user.AdminsToDeck.all().difference(creator_decks)
-    staff_decks = user.StaffsToDeck.all().difference(admin_decks).difference(creator_decks)
+    admin_decks = user.AdminsToDeck.filter(is_public=False).difference(creator_decks)
+    staff_decks = user.StaffsToDeck.filter(is_public=False).difference(admin_decks).difference(creator_decks)
     decks = chain(creator_decks, admin_decks, staff_decks)
     my_decks = []
     for deck in decks:

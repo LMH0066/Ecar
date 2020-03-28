@@ -10,7 +10,7 @@ from Login.models import User
 class PublicDecks(models.Model):
     public_id = models.AutoField(primary_key=True)
     # 关联卡组
-    deck = models.ForeignKey(Deck, on_delete=models.CASCADE)
+    deck_id = models.IntegerField()
     # 赞赏数
     star_num = models.IntegerField(default=0)
     # 赞赏的人
