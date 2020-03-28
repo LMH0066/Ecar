@@ -34,11 +34,10 @@ def publish_deck(request):
     # 创建public信息
     new_public_deck = PublicDecks(deck_id=new_deck.deck_id, author=deck.creator)
     new_public_deck.save()
-    c_time = serializers.serialize("json", new_public_deck.c_time)
-    ret['data'] = {'public_deck_id': new_public_deck.public_id, 'star_num': new_public_deck.star_num,
-                   'comment_num': new_public_deck.comment_num, 'c_time': json.loads(c_time),
-                   'deck_id': new_deck.deck_id, 'deck_name': new_deck.name,
-                   'card_amount': new_deck.amount}
+    # ret['data'] = {'public_deck_id': new_public_deck.public_id, 'star_num': new_public_deck.star_num,
+    #                'comment_num': new_public_deck.comment_num, 'c_time': new_public_deck.c_time,
+    #                'deck_id': new_deck.deck_id, 'deck_name': new_deck.name,
+    #                'card_amount': new_deck.amount}
     return HttpResponse(json.dumps(ret))
 
 
@@ -80,15 +79,21 @@ def get_public_deck(request):
         public_decks = PublicDecks.objects.order_by('star_num')[:max_size]
     all_decks = []
     for public_deck in public_decks:
-        deck = public_deck.deck
+        deck = Deck.objects.get(deck_id=public_deck.deck_id)
+        # deck = public_deck.deck
         user = public_deck.author
+        if user.avatar:
+            author_avatar = serializers.serialize("json", user.avatar)
+            author_avatar = json.loads(author_avatar)
+        else:
+            author_avatar = "/static/images/avatar.jpg"
         all_decks.append(
             {'public_deck_id': public_deck.public_id, 'star_num': public_deck.star_num,
-             'comment_num': public_deck.comment_num, 'c_time': public_deck.c_time, 'deck_id': deck.deck_id,
+             'comment_num': public_deck.comment_num, 'c_time': public_deck.c_time.strftime('%Y-%m-%d'), 'deck_id': deck.deck_id,
              'deck_name': deck.name,
              'card_amount': deck.amount,
              'deck_author': user.user_name,
-             'deck_author_avatar': user.avatar})
+             'deck_author_avatar': author_avatar})
     ret = {'status': True, 'data': all_decks}
     return HttpResponse(json.dumps(ret))
 
@@ -118,7 +123,7 @@ def show_public_deck(request):
 @csrf_exempt
 def star_deck(request):
     user_name = request.session['username']
-    public_id = request.session['public_id']
+    public_id = request.POST.get('public_id')
     ret = {'status': True}
     if PublicDecks.objects.filter(public_id=public_id, star_users__user_name=user_name).count() != 0:
         ret['status'] = False
@@ -156,3 +161,4 @@ def is_creator(request):
         ret['status'] = False
         ret['data'] = 'Insufficient permissions'
     return HttpResponse(json.dumps(ret))
+

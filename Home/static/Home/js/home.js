@@ -1,3 +1,20 @@
+let other_options = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'" +
+    "                   viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'" +
+    "                   stroke-linecap='round' stroke-linejoin='round' onclick='starDeck(this)'" +
+    "                   class='feather feather-heart deck-btn'>" +
+    "                    <path d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12" +
+    "                       5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06" +
+    "                       1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'></path>" +
+    "                </svg>" +
+    "                <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'" +
+    "                   viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'" +
+    "                   stroke-linecap='round' stroke-linejoin='round'" +
+    "                   class='feather feather-download deck-btn'>" +
+    "                    <path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'></path>" +
+    "                    <polyline points='7 10 12 15 17 10'></polyline>" +
+    "                    <line x1='12' y1='15' x2='12' y2='3'></line>" +
+    "                </svg>";
+
 $('#input-search').on('keyup', function () {
     let table = $('#deck-table').DataTable();
     table.columns(0).search($(this).val()).draw();
@@ -14,12 +31,12 @@ $(function () {
         // dom:'lBrtip',
         "ordering": false, // 禁止排序
         "columns": [
-            {data: "name"},
-            {data: "sharer"},
-            {data: "modified"},
-            {data: "notes"},
-            {data: "option"},
-            {data: "id", visible: false}
+            {sClass: "name"},
+            {sClass: "sharer"},
+            {sClass: "modified"},
+            {sClass: "notes"},
+            {sClass: "option"},
+            {sClass: "public_id", visible: false}
         ],
         "oLanguage": {
             "oPaginate": {
@@ -37,20 +54,27 @@ $(function () {
     });
     // 隐藏datatable自带的搜索框
     $('#deck-table_filter').hide();
+    showDecks();
 });
 
 //初始化引入所有卡组
 function showDecks() {
     $.ajax({
-        url: "/deck/",
+        url: "/GetPublicDeck",
         type: "POST",
         cache: false,
         contentType: false,
         processData: false,
         dataType: "json",
         success: function (result) {
-            if (result.status) {
-
+            if (result['status']) {
+                let $table = $('#deck-table').DataTable(),
+                    data = result['data'];
+                for (let i = data.length - 1; i >= 0; i--) {
+                    let row_data = [data[i]['deck_name'], data[i]['deck_author'], data[i]['c_time'],
+                        data[i]['star_num'], other_options, data[i]['public_deck_id']];
+                    $table.row.add(row_data).draw();
+                }
             } else {
                 Oops(result['data']);
             }
@@ -67,9 +91,9 @@ function starDeck(svg) {
     let row_index = $(svg).parents("tr").index();
     let row_data = $('#deck-table').DataTable().row(row_index).data();
     let form_data = new FormData();
-    form_data.append('deck_id', row_data.id);
+    form_data.append('public_id', row_data[5]);
     $.ajax({
-        url: "/deck/",
+        url: "/StarDeck",
         type: "POST",
         data: form_data,
         cache: false,
@@ -78,7 +102,7 @@ function starDeck(svg) {
         dataType: "json",
         success: function (result) {
             if (result.status) {
-
+                console.log("success")
             } else {
                 Oops(result['data']);
             }
