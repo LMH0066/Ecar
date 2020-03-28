@@ -95,9 +95,10 @@ function showDecks() {
 //点赞卡组
 function starDeck(svg) {
     //拿到点击的行号
-    let row_index = $(svg).parents("tr").index();
-    let row_data = $('#deck-table').DataTable().row(row_index).data();
-    let form_data = new FormData();
+    let tr = $(svg).parents("tr"),
+        row_index = tr.index(),
+        row_data = $('#deck-table').DataTable().row(row_index).data(),
+        form_data = new FormData();
     form_data.append('public_id', row_data[5]);
     $.ajax({
         url: "/StarDeck",
@@ -109,7 +110,8 @@ function starDeck(svg) {
         dataType: "json",
         success: function (result) {
             if (result.status) {
-                console.log("success")
+                let notes = tr.children('.notes').html();
+                tr.children('.notes').html(parseInt(notes)+1);
             } else {
                 Oops(result['data']);
             }
