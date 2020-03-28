@@ -5,8 +5,12 @@
 {% endblock %}
 
 {% block page_css %}
+    <link href="/static/plugins/sweetalerts/sweetalert2.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/plugins/sweetalerts/sweetalert.css" rel="stylesheet" type="text/css"/>
+
     <link href="/static/plugins/datatable/datatables-dark.css" rel="stylesheet" type="text/css"/>
     <link href="/static/plugins/datatable/dt-global_style-dark.css" rel="stylesheet" type="text/css"/>
+
     <link href="/static/Home/css/search.css" rel="stylesheet" type="text/css"/>
     <link href="/static/Home/css/home.css" rel="stylesheet" type="text/css"/>
 {% endblock %}
@@ -55,6 +59,7 @@
                                     <th>Modified</th>
                                     <th>Notes</th>
                                     <th class="no-content"></th>
+                                    <th>id</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -66,7 +71,7 @@
                                     <td>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
+                                             stroke-linecap="round" stroke-linejoin="round" onclick="starDeck(this)"
                                              class="feather feather-heart table-cancel">
                                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12
                                             5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06
@@ -81,6 +86,7 @@
                                             <line x1="12" y1="15" x2="12" y2="3"></line>
                                         </svg>
                                     </td>
+                                    <td>1</td>
                                 </tr>
                                 </tbody>
                                 <tfoot></tfoot>
@@ -94,6 +100,7 @@
 {% endblock %}
 
 {% block page_js %}
+    <script src="/static/plugins/sweetalerts/sweetalert2.min.js"></script>
     <script src="/static/plugins/datatable/datatables.js"></script>
     <script src="/static/Home/js/home.js"></script>
 {% endblock %}

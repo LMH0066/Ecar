@@ -81,17 +81,14 @@ function showDeckInfo() {
     } else {
         $('#deck-info2').hide();
     }
-};
+}
+
 // 点击添加卡片的按钮后
 $('#btn-add-card').on('click', function () {
     let form_data = new FormData();
     let input_front = $('#input-add-front'), input_back = $('#input-add-back');
     if (input_front.val() === "" || input_back.val() === "") {
-        swal({
-            type: 'error',
-            title: 'The input field is empty',
-            padding: '2em'
-        });
+        Oops('The input field is empty');
         return;
     }
     form_data.append('front_text', input_front.val());
@@ -212,7 +209,6 @@ function createDeck(create_by_link, deck_info1, deck_info2) {
         form_data.append('share_password', deck_info2);
         url = "ShareDeck";
     } else {
-        console.log(deck_info1);
         form_data.append('deck_name', deck_info1);
         url = "CreateDeck";
     }
@@ -299,7 +295,7 @@ function reviewDeck(svg) {
     let p_text = $(svg).parent().children('p').html();
     let review_amount = p_text.match(/\((.+?)\)/g)[0];
     review_amount = review_amount.substring(1, review_amount.length - 1);
-    if (review_amount === 0) {
+    if (review_amount === "0") {
         Oops("There are no cards need review");
         return;
     }
@@ -494,20 +490,11 @@ function showDecks() {
                     addDeck(data[i].deck_id, data[i].deck_name, data[i].card_amount, data[i].review_nums);
                 }
                 setInterval(updateDeck, 1000);
-            } else {
-                swal({
-                    type: 'error',
-                    title: 'Oops...',
-                    padding: '2em'
-                })
-            }
+            } else
+                Oops("");
         },
         error: function () {
-            swal({
-                type: 'error',
-                title: 'Oops...',
-                padding: '2em'
-            })
+            Oops("");
         }
     })
 }
@@ -585,14 +572,4 @@ function applyPermission() {
             admins_permission = false;
         }
     });
-}
-
-// 报错提示
-function Oops(info) {
-    swal({
-        type: 'error',
-        title: 'Oops...',
-        text: info,
-        padding: '2em'
-    })
 }

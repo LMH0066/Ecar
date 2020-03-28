@@ -185,3 +185,17 @@ h3 {
     white-space: normal !important;
     word-break: break-all;
 }
+
+.modal-options {
+    margin: auto auto;
+}
+
+.modal-options svg {
+    width: auto !important;
+    color: #3b3f5c !important;
+    cursor: pointer;
+}
+
+.modal-options svg:hover {
+    color: #3085d6 !important;
+}

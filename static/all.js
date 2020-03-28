@@ -38,3 +38,13 @@ function AccessPersonalInformation() {
 $(function () {
     AccessPersonalInformation();
 });
+
+// 报错提示
+function Oops(info) {
+    swal({
+        type: 'error',
+        title: 'Oops...',
+        text: info,
+        padding: '2em'
+    })
+}
