@@ -25,7 +25,7 @@ $(function () {
     deck_a.attr("aria-expanded", true);
     deck_a.attr("data-active", true);
 
-    $('#deck-table').DataTable({
+    let table = $('#deck-table').DataTable({
         "bLengthChange": false, //开关，是否显示每页显示多少条数据的下拉框
         // "searching": false,
         // dom:'lBrtip',
@@ -54,6 +54,13 @@ $(function () {
     });
     // 隐藏datatable自带的搜索框
     $('#deck-table_filter').hide();
+
+     $('#deck-table tbody').on('click', 'tr', function () {
+        let data = table.row(this).data();
+        showDetail(data);
+        // alert( 'You clicked on '+data[0]+'\'s row' );
+    } );
+
     showDecks();
 });
 
@@ -119,7 +126,7 @@ function downloadDeck(svg) {
     let row_index = $(svg).parents("tr").index();
     let row_data = $('#deck-table').DataTable().row(row_index).data();
     let form_data = new FormData();
-    form_data.append('deck_id', row_data.id);
+    form_data.append('public_id', row_data[5]);
     $.ajax({
         url: "/deck/",
         type: "POST",
@@ -139,4 +146,8 @@ function downloadDeck(svg) {
             Oops("");
         }
     })
+}
+// 显示评论 & 卡片
+function showDetail(data) {
+
 }

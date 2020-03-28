@@ -44,11 +44,11 @@ def publish_deck(request):
 # 删除广场卡组
 @csrf_exempt
 def delete_public_deck(request):
-    public_deck = PublicDecks.objects.get(public_id=request.session['public_id'])
+    public_deck = PublicDecks.objects.get(public_id=request.POST.get('public_id'))
     ret = {'status': True}
     Deck.objects.get(deck_id=public_deck.deck_id).delete()
     public_deck.delete()
-    return HttpResponse(json.dump(ret))
+    return HttpResponse(json.dumps(ret))
 
 
 # 查看自己公布的卡组
@@ -61,9 +61,8 @@ def get_author_deck(request):
         deck = Deck.objects.get(deck_id=author_deck.deck_id)
         my_decks.append(
             {'public_deck_id': author_deck.public_id, 'star_num': author_deck.star_num,
-             'comment_num': author_deck.comment_num, 'c_time': author_deck.c_time, 'deck_id': deck.deck_id,
-             'deck_name': deck.name,
-             'card_amount': deck.amount})
+             'comment_num': author_deck.comment_num, 'c_time': author_deck.c_time.strftime('%Y-%m-%d'),
+             'deck_id': deck.deck_id, 'deck_name': deck.name, 'card_amount': deck.amount})
     ret = {'status': True, 'data': my_decks}
     return HttpResponse(json.dumps(ret))
 

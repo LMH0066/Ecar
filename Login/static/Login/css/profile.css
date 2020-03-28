@@ -186,3 +186,95 @@
 .skills .widget-content-area .progress .progress-title span {
     align-self: center;
 }
+
+/*
+==============
+    Bio
+==============
+*/
+.bio .widget-content-area {
+    border-radius: 6px;
+    padding-bottom: 0;
+}
+.bio .widget-content-area h3 {
+    position: relative;
+    font-size: 21px;
+    font-weight: 600;
+    color: #3b3f5c;
+    margin: 6px 0 40px 0;
+}
+.bio .widget-content-area h3:after {
+    position: absolute;
+    content: "";
+    height: 2px;
+    width: 30px;
+    background: #1b55e2;
+    border-radius: 50%;
+    bottom: -2px;
+    left: 15px;
+}
+.bio .widget-content-area h5 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #3b3f5c;
+}
+.bio .widget-content-area p {
+    color: #888ea8;
+    font-size: 15px;
+}
+.bio .widget-content-area .bio-deck-box {
+    /*padding-top: 30px;*/
+    /*padding-bottom: 30px;*/
+    cursor: pointer;
+}
+.bio .widget-content-area .b-skills {
+    box-shadow: 2px 5px 17px 0 rgba(31,45,61,.17);
+    background: #fff;
+    border-radius: 10px;
+    padding: 30px 30px 24px;
+}
+.bio .widget-content-area .b-skills svg {
+    width: 30px;
+    height: 30px;
+    margin-right: 21px;
+    color: #1b55e2;
+}
+.bio .widget-content-area .b-skills h5 {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+.bio .widget-content-area .b-skills p { font-size: 13px; }
+.bio .widget-content-area .b-skills svg {
+    cursor: pointer;
+}
+.bio .widget-content-area .b-skills svg:hover {
+    color: #e7515a;
+}
+
+/*
+
+ */
+
+.card-btn {
+    color: #888ea8;
+    margin-right: 6px;
+    vertical-align: middle;
+    fill: rgba(0, 23, 55, 0.08);
+    cursor: pointer;
+}
+
+.card-btn:hover {
+    color: #e7515a;
+}
+
+.modify-btn {
+    color: #888ea8;
+    margin-right: 6px;
+    vertical-align: middle;
+    fill: rgba(0, 23, 55, 0.08);
+    cursor: pointer;
+}
+
+.modify-btn:hover {
+    color: #1e7e34;
+}

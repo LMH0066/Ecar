@@ -5,6 +5,14 @@
 {% endblock %}
 
 {% block page_css %}
+    <link href="/static/plugins/sweetalerts/sweetalert2.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/plugins/sweetalerts/sweetalert.css" rel="stylesheet" type="text/css"/>
+
+    <link href="/static/plugins/datatable/datatables.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/plugins/datatable/dt-global_style.css" rel="stylesheet" type="text/css"/>
+
+    <link href="/static/plugins/modal.css" rel="stylesheet" type="text/css"/>
+
     <link href="/static/Login/css/profile.css" rel="stylesheet" type="text/css"/>
 {% endblock %}
 
@@ -51,7 +59,7 @@
                                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                                             <polyline points="22,6 12,13 2,6"></polyline>
                                         </svg>
-                                        </a>
+                                    </a>
                                 </li>
                                 <li class="contacts-block__item">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -101,10 +109,70 @@
                 </div>
             </div>
 
+            <div class="bio layout-spacing ">
+                <div class="widget-content widget-content-area">
+                    <h3 class="">Public Decks</h3>
+                    <div class="bio-deck-box">
+                        <div class="row"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="cardModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cardModalCenterTitle"></h5>
+                    <div class="modal-options"></div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row col-xl-12 col-lg-12 col-sm-12">
+                        <div class="table-responsive">
+                            <table id="card-table" class="table table-hover" style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>Front</th>
+                                    <th>Back</th>
+                                    <th class="no-content"></th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row col-12">
+                        <div class="col-5">
+                            <input type="text" class="form-control" id="input-add-front" placeholder="front">
+                        </div>
+                        <div class="col-5">
+                            <input type="text" class="form-control" id="input-add-back" placeholder="back">
+                        </div>
+                        <div class="col-2">
+                            <button id="btn-add-card" type="button" class="btn btn-primary">Add Card</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
 
 {% block page_js %}
+    <script src="/static/plugins/datatable/datatables.js"></script>
+    <script src="/static/plugins/sweetalerts/sweetalert2.min.js"></script>
+    <script src="/static/Deck/js/modal_card.js"></script>
     <script src="/static/Login/js/profile.js"></script>
 {% endblock %}
