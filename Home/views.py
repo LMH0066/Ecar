@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -5,7 +7,7 @@ from django.core import serializers
 import json
 
 from Card.models import Card, MemoryInfo
-from Deck.models import Deck
+from Deck.models import Deck, DeckInfo
 from Login.models import User
 from .models import PublicDecks, Comment
 
@@ -160,6 +162,33 @@ def comment_deck(request):
     ret = {'status': True, 'data': {
         'user_name': user.user_name, 'user_avatar': author_avatar,
         'content': new_comment.content, 'c_time': new_comment.c_time.strftime('%Y-%m-%d %H:%M:%S')}}
+    return HttpResponse(json.dumps(ret))
+
+
+# 下载卡组
+@csrf_exempt
+def download_deck(request):
+    user = User.objects.get(user_name=request.session['username'])
+    public_deck = PublicDecks.objects.get(public_id=request.POST.get('public_id'))
+    deck = Deck.objects.get(deck_id=public_deck.deck_id)
+    ret = {'status': True}
+    count = user.objects.filter(deck__name=deck.name).count()
+    if count != 0:
+        deck_name = deck.name + uuid4()
+    else:
+        deck_name = deck.name
+    new_deck = Deck(name=deck_name, amount=deck.amount, creator=user)
+    new_deck.save()
+    new_deck_info = DeckInfo(deck=new_deck, user=user)
+    new_deck_info.save()
+    cards = Card.objects.filter(deck=deck)
+    for card in cards:
+        new_card = Card(q_text=card.q_text, q_img=card.q_img, ans_text=card.ans_text,
+                        ans_img=card.ans_img, deck=new_deck)
+        new_card.save()
+        new_memory_info = MemoryInfo(card=new_deck, user=user)
+        new_memory_info.save()
+    ret['data'] = {'deck_name': new_deck.name, 'deck_id': new_deck.deck_id, 'deck_amount': new_deck.amount}
     return HttpResponse(json.dumps(ret))
 
 
