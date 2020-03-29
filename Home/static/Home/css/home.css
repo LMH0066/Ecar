@@ -9,3 +9,7 @@
 .deck-btn:hover {
     color: #e7515a;
 }
+
+.modal-content .modal-body p {
+    color: #515365;
+}

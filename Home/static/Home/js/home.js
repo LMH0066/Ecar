@@ -1,3 +1,5 @@
+let public_deck_id;
+
 let deck_options = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'" +
     "                   viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'" +
     "                   stroke-linecap='round' stroke-linejoin='round' onclick='starDeck(this)'" +
@@ -82,11 +84,11 @@ $(function () {
 
     // $("#card-table").DataTable().Column[".td-options"].Visible = false;
 
-     $('#deck-table tbody').on('click', 'tr', function () {
+    $('#deck-table tbody').on('click', 'tr', function () {
         let data = table.row(this).data();
         showDetail(data);
         // alert( 'You clicked on '+data[0]+'\'s row' );
-    } );
+    });
 
     showDecks();
 });
@@ -109,7 +111,8 @@ function showDecks() {
                         "name": data[i]['deck_name'], "sharer": data[i]['deck_author'],
                         "modified": data[i]['c_time'], "notes": data[i]['star_num'],
                         "option": deck_options, "public_id": data[i]['public_deck_id'],
-                        "deck_id": data[i]['deck_id']};
+                        "deck_id": data[i]['deck_id']
+                    };
                     $table.row.add(row_data).draw();
                 }
             } else {
@@ -141,7 +144,7 @@ function starDeck(svg) {
         success: function (result) {
             if (result.status) {
                 let notes = tr.children('.notes').html();
-                tr.children('.notes').html(parseInt(notes)+1);
+                tr.children('.notes').html(parseInt(notes) + 1);
             } else {
                 Oops(result['data']);
             }
@@ -168,7 +171,7 @@ function downloadDeck(svg) {
         processData: false,
         dataType: "json",
         success: function (result) {
-            if (result.status) {
+            if (result['status']) {
 
             } else {
                 Oops(result['data']);
@@ -179,9 +182,94 @@ function downloadDeck(svg) {
         }
     })
 }
-// 显示评论 & 卡片
+
+// 显示评论
+function showDeckComments() {
+    let $container = $('#comments-container .row');
+    $container.empty();
+    let form_data = new FormData();
+    form_data.append('public_id', public_deck_id);
+    $.ajax({
+        url: "/ShowDeckComments",
+        type: "POST",
+        data: form_data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function (result) {
+            if (result['status']) {
+                let data = result['data'];
+                for (let i = 0; i < data.length; i++) {
+                    addComment(data[i]['user_avatar'], data[i]['user_name'],
+                        data[i]['content'], data[i]['c_time'])
+                }
+            } else {
+                $container.append($("<h1>" + result['data'] + "</h1>"));
+            }
+        },
+        error: function () {
+            Oops("");
+        }
+    })
+}
+
+// 显示卡片
 function showDetail(data) {
     // console.log(data);
+    public_deck_id = data.public_id;
     showCards(data['name'], data['deck_id']);
     $("#cardModal").modal('show');
+}
+
+// 评论
+$('#btn-add-comment').on('click', function () {
+    let form_data = new FormData();
+    let input_content = $('#input-add-comment');
+    if (input_content.val() === "") {
+        Oops('The input field is empty');
+        return;
+    }
+    form_data.append('context', input_content.val());
+    $.ajax({
+        url: "/CommentDeck",
+        type: "POST",
+        data: form_data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function (result) {
+            if (result['status']) {
+                input_content.val("");
+                let data = result['data'];
+                addComment(data['user_avatar'], data['user_name'],
+                        data['content'], data['c_time'])
+            } else {
+                Oops(result['data']);
+            }
+        },
+        error: function () {
+            Oops("");
+        }
+    })
+});
+
+function addComment(user_avatar, user_name, content, c_time) {
+    let $container = $('#comments-container .row');
+    $container.append($("<div class='col-xl-9 mx-auto'>" +
+        "                    <blockquote class='blockquote media-object'>" +
+        "                        <div class='media'>" +
+        "                            <div class='usr-img mr-2'>" +
+        "                                <img alt='avatar' class='br-30'" +
+        "                                     src='" + user_avatar + "'>" +
+        "                            </div>" +
+        "                            <div class='media-body align-self-center'>" +
+        "                                <h4>" + user_name + "</h4>" +
+        "                                <p class='d-inline'>" + content + "</p>" +
+        "                            </div>" +
+        "                        </div>" +
+        "                        <small class='text-right'>" + c_time + "</small>" +
+        "                    </blockquote>" +
+        "                </div>"));
 }

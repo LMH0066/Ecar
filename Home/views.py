@@ -96,7 +96,7 @@ def get_public_deck(request):
 
 
 @csrf_exempt
-def show_public_deck(request):
+def show_deck_comments(request):
     public_id = request.POST.get('public_id')
     request.session['public_id'] = public_id
     ret = {'status': True}
@@ -105,9 +105,14 @@ def show_public_deck(request):
         all_comments = []
         for comment in comments:
             user = comment.user
+            if user.avatar:
+                author_avatar = serializers.serialize("json", user.avatar)
+                author_avatar = json.loads(author_avatar)
+            else:
+                author_avatar = "/static/images/avatar.jpg"
             all_comments.append(
-                {'user_name': user.user_name, 'user_avatar': user.avatar, 'content': comment.content,
-                 'c_time': comment.c_time}
+                {'user_name': user.user_name, 'user_avatar': author_avatar, 'content': comment.content,
+                 'c_time': comment.c_time.strftime('%Y-%m-%d %H:%M:%S')}
             )
             ret['data'] = all_comments
     else:
@@ -144,7 +149,17 @@ def comment_deck(request):
     new_comment.save()
     public_deck.comment_num += 1
     public_deck.save()
-    ret = {'status': True}
+
+    user = new_comment.user
+    if user.avatar:
+        author_avatar = serializers.serialize("json", user.avatar)
+        author_avatar = json.loads(author_avatar)
+    else:
+        author_avatar = "/static/images/avatar.jpg"
+
+    ret = {'status': True, 'data': {
+        'user_name': user.user_name, 'user_avatar': author_avatar,
+        'content': new_comment.content, 'c_time': new_comment.c_time.strftime('%Y-%m-%d %H:%M:%S')}}
     return HttpResponse(json.dumps(ret))
 
 
@@ -158,4 +173,3 @@ def is_creator(request):
         ret['status'] = False
         ret['data'] = 'Insufficient permissions'
     return HttpResponse(json.dumps(ret))
-

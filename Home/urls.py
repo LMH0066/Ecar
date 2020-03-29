@@ -10,5 +10,6 @@ urlpatterns = [
     path('GetPublicDeck', views.get_public_deck),
     path('StarDeck', views.star_deck),
     path('CommentDeck', views.comment_deck),
+    path('ShowDeckComments', views.show_deck_comments),
     path('IsCreator', views.is_creator),
 ]

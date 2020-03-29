@@ -124,9 +124,9 @@
                         <div class="col-xl-12 col-lg-12 col-sm-12">
                             <ul class="nav nav-tabs  mb-3" id="animateLine" role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="animated-underline-home-tab" data-toggle="tab"
-                                       href="#animated-underline-home" role="tab"
-                                       aria-controls="animated-underline-home" aria-selected="true">
+                                    <a class="nav-link active" id="animated-card-tab" data-toggle="tab"
+                                       href="#animated-card" role="tab"
+                                       aria-controls="animated-card" aria-selected="true">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                              stroke-linecap="round" stroke-linejoin="round"
@@ -137,9 +137,9 @@
                                         Cards</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="animated-underline-profile-tab" data-toggle="tab"
-                                       href="#animated-underline-profile" role="tab"
-                                       aria-controls="animated-underline-profile" aria-selected="false">
+                                    <a class="nav-link" id="animated-comments-tab" data-toggle="tab"
+                                       href="#animated-comments" role="tab" onclick="showDeckComments()"
+                                       aria-controls="animated-comments" aria-selected="false">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                              stroke-linecap="round" stroke-linejoin="round"
@@ -152,8 +152,8 @@
                             </ul>
 
                             <div class="tab-content" id="">
-                                <div class="tab-pane fade show active" id="animated-underline-home" role="tabpanel"
-                                     aria-labelledby="animated-underline-home-tab">
+                                <div class="tab-pane fade show active" id="animated-card" role="tabpanel"
+                                     aria-labelledby="animated-card-tab">
                                     <div class="widget-content widget-content-area br-6">
                                         <div class="table-responsive">
                                             <table id="card-table" class="table table-hover" style="width:100%">
@@ -169,16 +169,43 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" id="animated-underline-profile" role="tabpanel"
-                                     aria-labelledby="animated-underline-profile-tab">
-                                    <div class="media">
-                                        <div class="media-body">
-                                            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque
-                                            ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus
-                                            viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec
-                                            lacinia congue felis in faucibus.
+                                <div class="tab-pane fade" id="animated-comments" role="tabpanel"
+                                     aria-labelledby="animated-comments-tab">
+                                    <div id="comments-container" class="mb-3">
+                                        <div class="row"></div>
+                                    </div>
+                                    <div id="container-add-comments">
+                                        <div class="row">
+                                            <div class="col-10">
+                                                <input type="text" class="form-control" id="input-add-comment"
+                                                       placeholder="comment content">
+                                            </div>
+                                            <div class="col-2">
+                                                <button id="btn-add-comment" type="button" class="btn btn-primary">
+                                                    Add Comment
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
+                                    <!--
+                                    <div class="col-xl-9 mx-auto">
+                                        <blockquote class="blockquote media-object">
+                                            <div class="media">
+                                                <div class="usr-img mr-2">
+                                                    <img alt="avatar" src="/static/images/avatar.jpg"
+                                                         class="br-30">
+                                                </div>
+                                                <div class="media-body align-self-center">
+                                                    <h4>lmh</h4>
+                                                    <p class="d-inline">Morbi luctus elit eu sem euismod, at elementum
+                                                        odio tincidunt.</p>
+                                                </div>
+                                            </div>
+                                            <small class="text-right">Someone famous <cite title="Source Title">Source
+                                                Title</cite></small>
+                                        </blockquote>
+                                    </div>
+                                    -->
                                 </div>
                             </div>
                         </div>
