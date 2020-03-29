@@ -88,11 +88,9 @@ def get_public_deck(request):
             author_avatar = "/static/images/avatar.jpg"
         all_decks.append(
             {'public_deck_id': public_deck.public_id, 'star_num': public_deck.star_num,
-             'comment_num': public_deck.comment_num, 'c_time': public_deck.c_time.strftime('%Y-%m-%d'), 'deck_id': deck.deck_id,
-             'deck_name': deck.name,
-             'card_amount': deck.amount,
-             'deck_author': user.user_name,
-             'deck_author_avatar': author_avatar})
+             'comment_num': public_deck.comment_num, 'c_time': public_deck.c_time.strftime('%Y-%m-%d'),
+             'deck_id': deck.deck_id, 'deck_name': deck.name, 'card_amount': deck.amount,
+             'deck_author': user.user_name, 'deck_author_avatar': author_avatar})
     ret = {'status': True, 'data': all_decks}
     return HttpResponse(json.dumps(ret))
 

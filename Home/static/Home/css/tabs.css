@@ -1,0 +1,104 @@
+.nav-tabs svg {
+    width: 20px;
+    vertical-align: bottom;
+}
+
+.nav-tabs .nav-link.active {
+    color: #e95f2b;
+    background-color: #fff;
+    border-color: #e0e6ed #e0e6ed #fff;
+}
+
+.nav-tabs .nav-link.active:after {
+    color: #e95f2b;
+}
+
+.nav-tabs {
+    border-bottom: 1px solid #ebedf2;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: #ebedf2 #ebedf2 #f1f2f3;
+}
+
+.dropdown-menu {
+    box-shadow: 0px 0px 15px 1px rgba(113, 106, 202, 0.1);
+}
+
+.nav-tabs .dropdown-item:hover {
+    background-color: #f1f2f3;
+    color: #515365;
+}
+
+.nav-tabs li a.disabled {
+    color: #acb0c3 !important;
+}
+
+.nav-pills .nav-item:not(:last-child) {
+    margin-right: 5px;
+}
+
+.nav-pills .nav-link.active:after {
+    color: #fff;
+}
+
+.nav-pills .nav-link {
+    color: #3b3f5c;
+}
+
+.nav-pills .show > .nav-link {
+    background-color: #e95f2b;
+}
+
+.nav-pills li a.disabled {
+    color: #acb0c3 !important;
+}
+
+h4 {
+    font-size: 1.125rem;
+}
+
+/*
+    Animated Underline
+*/
+
+.animated-underline-content .nav-tabs {
+    border-bottom: 1px solid #e0e6ed;
+}
+
+.animated-underline-content .nav-tabs li a {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    position: relative;
+}
+
+.animated-underline-content .tab-content > .tab-pane {
+    padding: 20px 0 0 0;
+}
+
+.animated-underline-content .nav-tabs .nav-link.active, .animated-underline-content .nav-tabs .show > .nav-link {
+    border-color: transparent;
+    color: #5c1ac3;
+}
+
+.animated-underline-content .nav-tabs .nav-link:focus, .animated-underline-content .nav-tabs .nav-link:hover {
+    border-color: transparent;
+}
+
+.animated-underline-content .nav-tabs .nav-link.active:before {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
+
+.animated-underline-content .nav-tabs .nav-link:before {
+    content: "";
+    height: 1px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    background-color: #5c1ac3;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+    transition: all .3s;
+}

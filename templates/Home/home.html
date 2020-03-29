@@ -8,9 +8,12 @@
     <link href="/static/plugins/sweetalerts/sweetalert2.min.css" rel="stylesheet" type="text/css"/>
     <link href="/static/plugins/sweetalerts/sweetalert.css" rel="stylesheet" type="text/css"/>
 
+    <link href="/static/plugins/modal.css" rel="stylesheet" type="text/css"/>
+
     <link href="/static/plugins/datatable/datatables-dark.css" rel="stylesheet" type="text/css"/>
     <link href="/static/plugins/datatable/dt-global_style-dark.css" rel="stylesheet" type="text/css"/>
 
+    <link href="/static/Home/css/tabs.css" rel="stylesheet" type="text/css"/>
     <link href="/static/Home/css/search.css" rel="stylesheet" type="text/css"/>
     <link href="/static/Home/css/home.css" rel="stylesheet" type="text/css"/>
 {% endblock %}
@@ -99,10 +102,98 @@
             </div>
         </div>
     </div>
+    <!-- Modal -->
+    <div class="modal fade" id="cardModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cardModalCenterTitle"></h5>
+                    <div class="modal-options"></div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12 col-sm-12">
+                            <ul class="nav nav-tabs  mb-3" id="animateLine" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="animated-underline-home-tab" data-toggle="tab"
+                                       href="#animated-underline-home" role="tab"
+                                       aria-controls="animated-underline-home" aria-selected="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                             stroke-linecap="round" stroke-linejoin="round"
+                                             class="feather feather-copy">
+                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                        </svg>
+                                        Cards</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="animated-underline-profile-tab" data-toggle="tab"
+                                       href="#animated-underline-profile" role="tab"
+                                       aria-controls="animated-underline-profile" aria-selected="false">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                             stroke-linecap="round" stroke-linejoin="round"
+                                             class="feather feather-send">
+                                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                        </svg>
+                                        Comments</a>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content" id="">
+                                <div class="tab-pane fade show active" id="animated-underline-home" role="tabpanel"
+                                     aria-labelledby="animated-underline-home-tab">
+                                    <div class="widget-content widget-content-area br-6">
+                                        <div class="table-responsive">
+                                            <table id="card-table" class="table table-hover" style="width:100%">
+                                                <thead>
+                                                <tr>
+                                                    <th>Front</th>
+                                                    <th>Back</th>
+                                                    <th class="no-content"></th>
+                                                </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="animated-underline-profile" role="tabpanel"
+                                     aria-labelledby="animated-underline-profile-tab">
+                                    <div class="media">
+                                        <div class="media-body">
+                                            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque
+                                            ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus
+                                            viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec
+                                            lacinia congue felis in faucibus.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer"></div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block page_js %}
     <script src="/static/plugins/sweetalerts/sweetalert2.min.js"></script>
     <script src="/static/plugins/datatable/datatables.js"></script>
+    <script src="/static/Deck/js/modal_card.js"></script>
     <script src="/static/Home/js/home.js"></script>
 {% endblock %}

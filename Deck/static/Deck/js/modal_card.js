@@ -49,16 +49,16 @@ $('#btn-add-card').on('click', function () {
         processData: false,
         dataType: "json",
         success: function (result) {
-            if (result.status) {
+            if (result['status']) {
                 let table = $('#card-table').DataTable();
                 table.row.add([input_front.val(), input_back.val(), other_options]).draw();
                 input_front.val("");
                 input_back.val("");
-                let card = findCardSelector(result.data.deck_name);
-                if (result.data.card_amount < 5)
+                let card = findCardSelector(result['data']['deck_name']);
+                if (result['data']['card_amount'] < 5)
                     card.append($("<div class='child'></div>"));
                 let p = card.children().children('p');
-                p.text(result.data.card_amount + " cards");
+                p.text(result['data']['card_amount'] + " cards");
             } else {
                 Oops(result['data']);
             }
@@ -99,17 +99,17 @@ function deleteCard(svg) {
                 processData: false,
                 dataType: "json",
                 success: function (ret) {
-                    if (ret.status) {
+                    if (ret['status']) {
                         // $(svg).parents('tr').remove();
                         let table = $('#card-table').DataTable();
                         table.row($(svg).parents('tr')).remove().draw();
-                        let card = findCardSelector(ret.data.deck_name);
-                        if (ret.data.card_amount > 0)
+                        let card = findCardSelector(ret['data']['deck_name']);
+                        if (ret['data']['card_amount'] > 0)
                             card.children("div:last").remove();
                         let p = card.children().children('p');
-                        p.text(ret.data.card_amount + " cards");
+                        p.text(ret['data']['card_amount'] + " cards");
                     } else {
-                        Oops(ret.data);
+                        Oops(ret['data']);
                     }
                 },
                 error: function () {
@@ -243,7 +243,7 @@ function applyPermission() {
     });
 }
 
-$(function () {
+function initCardTable() {
     $('#card-table').DataTable({
         "bLengthChange": false, //开关，是否显示每页显示多少条数据的下拉框
         "searching": false,
@@ -268,4 +268,8 @@ $(function () {
         "stripeClasses": [],
         "pageLength": 6
     });
+}
+
+$(function () {
+
 });

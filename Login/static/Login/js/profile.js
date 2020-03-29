@@ -14,6 +14,7 @@ $(function () {
     $('#profile_li').addClass("active");
 
     getAuthorDeck();
+    initCardTable();
 });
 
 function getAuthorDeck() {
@@ -53,7 +54,7 @@ function showDeck(data) {
         "                           <p>Card Amount：" + data['card_amount'] + "</p>" +
         "                           <p>Last modified：" + data['c_time'] + "</p>" +
         "                           <p hidden class='public_id'>" + data['public_deck_id'] + "</p>" +
-        btn_delete_deck +
+                                    btn_delete_deck +
         "                       </div>" +
         "                   </div>" +
         "               </div>"));

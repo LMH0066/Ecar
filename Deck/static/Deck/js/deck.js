@@ -57,6 +57,7 @@ $(function () {
     deck_a.attr("aria-expanded", true);
     deck_a.attr("data-active", true);
     showDecks();
+    initCardTable();
 });
 
 // 在页面上添加卡组
