@@ -172,7 +172,7 @@ def download_deck(request):
     public_deck = PublicDecks.objects.get(public_id=request.POST.get('public_id'))
     deck = Deck.objects.get(deck_id=public_deck.deck_id)
     ret = {'status': True}
-    count = user.objects.filter(deck__name=deck.name).count()
+    count = Deck.objects.filter(user=user, name=deck.name).count()
     if count != 0:
         deck_name = deck.name + uuid4()
     else:
