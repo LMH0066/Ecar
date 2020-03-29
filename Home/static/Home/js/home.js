@@ -10,7 +10,7 @@ let deck_options = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='2
     "                </svg>" +
     "                <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'" +
     "                   viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'" +
-    "                   stroke-linecap='round' stroke-linejoin='round'" +
+    "                   stroke-linecap='round' stroke-linejoin='round' onclick='downloadDeck(this)'" +
     "                   class='feather feather-download deck-btn'>" +
     "                    <path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'></path>" +
     "                    <polyline points='7 10 12 15 17 10'></polyline>" +
@@ -127,6 +127,12 @@ function showDecks() {
 
 //点赞卡组
 function starDeck(svg) {
+    let ev = window.event || arguments.callee.caller.arguments[0];
+    if (window.event) ev.cancelBubble = true;
+    else {
+        ev.stopPropagation();
+    }
+
     //拿到点击的行号
     let tr = $(svg).parents("tr"),
         row_index = tr.index(),
@@ -157,13 +163,19 @@ function starDeck(svg) {
 
 //下载卡组
 function downloadDeck(svg) {
+    let ev = window.event || arguments.callee.caller.arguments[0];
+    if (window.event) ev.cancelBubble = true;
+    else {
+        ev.stopPropagation();
+    }
+
     //拿到点击的行号
     let row_index = $(svg).parents("tr").index();
     let row_data = $('#deck-table').DataTable().row(row_index).data();
     let form_data = new FormData();
     form_data.append('public_id', row_data.public_id);
     $.ajax({
-        url: "/deck/",
+        url: "/DownloadDeck",
         type: "POST",
         data: form_data,
         cache: false,
@@ -172,7 +184,7 @@ function downloadDeck(svg) {
         dataType: "json",
         success: function (result) {
             if (result['status']) {
-
+                swal("Good job!", "Successfully add!", "success");
             } else {
                 Oops(result['data']);
             }
@@ -244,7 +256,7 @@ $('#btn-add-comment').on('click', function () {
                 input_content.val("");
                 let data = result['data'];
                 addComment(data['user_avatar'], data['user_name'],
-                        data['content'], data['c_time'])
+                    data['content'], data['c_time'])
             } else {
                 Oops(result['data']);
             }
@@ -257,7 +269,7 @@ $('#btn-add-comment').on('click', function () {
 
 function addComment(user_avatar, user_name, content, c_time) {
     let $container = $('#comments-container .row');
-    $container.append($("<div class='col-xl-9 mx-auto'>" +
+    $container.prepend($("<div class='col-xl-9 mx-auto'>" +
         "                    <blockquote class='blockquote media-object'>" +
         "                        <div class='media'>" +
         "                            <div class='usr-img mr-2'>" +

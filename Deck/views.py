@@ -219,7 +219,7 @@ def copy_deck(request):
         new_card = Card(q_text=card.q_text, q_img=card.q_img, ans_text=card.ans_text,
                         ans_img=card.ans_img, deck=new_deck)
         new_card.save()
-        new_memory_info = MemoryInfo(card=new_deck, user=user)
+        new_memory_info = MemoryInfo(card=new_card, user=user)
         new_memory_info.save()
     ret['data'] = {'deck_name': new_deck.name, 'deck_id': new_deck.deck_id, 'deck_amount': new_deck.amount}
     return HttpResponse(json.dumps(ret))

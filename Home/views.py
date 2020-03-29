@@ -1,4 +1,5 @@
 from uuid import uuid4
+from uuid import uuid1
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -172,9 +173,9 @@ def download_deck(request):
     public_deck = PublicDecks.objects.get(public_id=request.POST.get('public_id'))
     deck = Deck.objects.get(deck_id=public_deck.deck_id)
     ret = {'status': True}
-    count = Deck.objects.filter(user=user, name=deck.name).count()
+    count = Deck.objects.filter(creator=user, name=deck.name).count()
     if count != 0:
-        deck_name = deck.name + uuid4()
+        deck_name = deck.name + "___" + str(uuid4())
     else:
         deck_name = deck.name
     new_deck = Deck(name=deck_name, amount=deck.amount, creator=user)
@@ -186,7 +187,7 @@ def download_deck(request):
         new_card = Card(q_text=card.q_text, q_img=card.q_img, ans_text=card.ans_text,
                         ans_img=card.ans_img, deck=new_deck)
         new_card.save()
-        new_memory_info = MemoryInfo(card=new_deck, user=user)
+        new_memory_info = MemoryInfo(card=new_card, user=user)
         new_memory_info.save()
     ret['data'] = {'deck_name': new_deck.name, 'deck_id': new_deck.deck_id, 'deck_amount': new_deck.amount}
     return HttpResponse(json.dumps(ret))
