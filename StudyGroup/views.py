@@ -32,7 +32,7 @@ def get_study_group(request):
             study_group = study_groups.first()
             my_study_group.append(
                 {'group_id': study_group.group_id, 'group_name': study_group.group_name,
-                 'people_num': study_group.people_num, 'deck_name': deck.name}
+                 'people_num': study_group.people_num, 'deck_name': deck.name, 'deck_id': deck.deck_id}
             )
 
     ret = {'status': True, 'data': my_study_group}

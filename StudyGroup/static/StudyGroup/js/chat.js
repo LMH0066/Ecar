@@ -40,8 +40,10 @@ function getChats(findChat) {
         dataType: "json",
         success: function (ret) {
             if (ret['status']) {
-                // let chat_container = $('#chat-conversation-box-scroll .chat[data-chat = ' + findChat + ']');
-                // console.log(ret['data']);
+                // 清空
+                let chat_container = $('#chat-conversation-box-scroll .chat[data-chat = ' + findChat + ']');
+                chat_container.empty();
+                // console.log(chat_container);
                 let data = ret['data'];
                 for (let i = 0; i < data.length; i++) {
                     let $messageHtml;
@@ -63,7 +65,8 @@ function getChats(findChat) {
 }
 
 function showChat(div) {
-    if ($(div).hasClass('.active')) {
+    // console.log($(div).hasClass('active'));
+    if ($(div).hasClass('active')) {
         return false;
     } else {
         let findChat = $(div).attr('data-chat');

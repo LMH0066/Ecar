@@ -32,6 +32,10 @@ let admins_permission = false;
 
 // 点击添加卡片的按钮后
 $('#btn-add-card').on('click', function () {
+    if (!admins_permission) {
+        Oops('You don\'t have permission.');
+        return;
+    }
     let form_data = new FormData();
     let input_front = $('#input-add-front'), input_back = $('#input-add-back');
     if (input_front.val() === "" || input_back.val() === "") {
@@ -71,6 +75,10 @@ $('#btn-add-card').on('click', function () {
 
 // 删除卡片
 function deleteCard(svg) {
+    if (!admins_permission) {
+        Oops('You don\'t have permission.');
+        return;
+    }
     let front_text = $(svg).parents('tr').children('.td-front').html();
     swal({
         title: 'Sure?',
@@ -123,8 +131,12 @@ function deleteCard(svg) {
 // 修改卡片
 function modifyCard(svg) {
     // 如果正在修改，提示报错
-    if (card_modifying || !admins_permission) {
-        Oops('');
+    if (card_modifying) {
+        Oops('You are modifying other Card');
+        return;
+    }
+    if (!admins_permission) {
+        Oops('You don\'t have permission.');
         return;
     }
     card_modifying = true;

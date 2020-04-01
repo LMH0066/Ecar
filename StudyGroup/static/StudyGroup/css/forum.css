@@ -1,0 +1,23 @@
+.card-btn {
+    color: #888ea8;
+    margin-right: 6px;
+    vertical-align: middle;
+    fill: rgba(0, 23, 55, 0.08);
+    cursor: pointer;
+}
+
+.card-btn:hover {
+    color: #e7515a;
+}
+
+.modify-btn {
+    color: #888ea8;
+    margin-right: 6px;
+    vertical-align: middle;
+    fill: rgba(0, 23, 55, 0.08);
+    cursor: pointer;
+}
+
+.modify-btn:hover {
+    color: #1e7e34;
+}

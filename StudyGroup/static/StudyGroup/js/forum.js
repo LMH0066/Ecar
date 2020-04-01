@@ -5,6 +5,7 @@ $(function () {
     $('#sg_ul').addClass("show");
     $('#forum_li').addClass("active");
     getStudyGroup();
+    initCardTable();
 });
 
 function getStudyGroup() {
@@ -31,17 +32,33 @@ function getStudyGroup() {
 }
 
 function addGroup(data) {
+    // console.log(data);
     $('.people').append($("" +
-        "<div class='person' data-chat='group_"+ data['group_id'] +"' onclick='showChat(this)'>" +
+        "<div class='person' data-deck-id='"+ data['deck_id'] +"'" +
+        " data-chat='group_"+ data['group_id'] +"' onclick='showChat(this)'>" +
         "   <div class='user-info'>" +
         "       <div class='f-body'>" +
         "           <div class='meta-info'>" +
         "               <span class='user-name' data-name='"+ data['group_name'] +"'>" + data['group_name'] + "</span>" +
         "           </div>" +
-        "           <span class='preview'>deck name: "+ data['deck_name'] +"</span>" +
+        "           <span data-deck-name='"+ data['deck_name'] +"'" +
+        "            class='preview deck-name'>deck name: "+ data['deck_name'] +"</span>" +
         "       </div>" +
         "   </div>" +
         "</div>"));
     $('#chat-conversation-box-scroll').append($("" +
         "<div class='chat' data-chat='group_"+ data['group_id'] +"'></div>"));
+}
+
+function showGroupCards() {
+    let $group = $('.user-list-box .person').filter('.active');
+    let deck_id = $group.attr('data-deck-id'),
+        deck_name = $group.find('.deck-name').attr('data-deck-name');
+    showCards(deck_name, deck_id);
+}
+
+function deckShare() {
+    let $group = $('.user-list-box .person').filter('.active');
+    let deck_id = $group.attr('data-deck-id');
+    shareDeck(deck_id);
 }

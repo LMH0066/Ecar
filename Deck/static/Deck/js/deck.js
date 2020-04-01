@@ -66,7 +66,7 @@ function addDeck(deck_id, deck_name, amount, need_review_amout) {
     let show_amount = amount > 4 ? 4 : amount;
     let deck_html = $("<div class='col-xl-3 col-lg-3 col-md-6 col-sm-6 items' style='--cards:" + show_amount + ";'>" +
         "                  <div class='card'>" +
-        "                      <div class='child' data-target='#cardModal' data-toggle='modal' " +
+        "                      <div class='child' data-target='#cardModal' data-toggle='modal'" +
         "                       onclick='showCards(" + deck_name + ", " + deck_id + ")' id='" + deck_id + "'>" +
         "                          <h3>" + deck_name + "</h3>" +
         "                          <p>" + amount + " cards(" + need_review_amout + ")</p>" +
@@ -84,7 +84,7 @@ function addDeck(deck_id, deck_name, amount, need_review_amout) {
         "                          data-content='Review'>" +
         "                              <path d='M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z'></path>" +
         "                              <path d='M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'></path></svg>" +
-        "                          <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' onclick='shareDeck(this)'" +
+        "                          <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' onclick='shareDeck(" + deck_id + ")'" +
         "                          viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' " +
         "                          stroke-linecap='round' stroke-linejoin='round' class='deck-option bs-popover rounded'" +
         "                          data-content='Share'>" +

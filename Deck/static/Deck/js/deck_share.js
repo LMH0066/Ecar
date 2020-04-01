@@ -1,11 +1,11 @@
-function shareDeck(svg) {
+function shareDeck(deck_id) {
     let ev = window.event || arguments.callee.caller.arguments[0];
     if (window.event) ev.cancelBubble = true;
     else {
         ev.stopPropagation();
     }
 
-    let deck_id = $(svg).parent().attr("id");
+    // let deck_id = $(svg).parent().attr("id");
     swal({
         title: "Share Deck",
         text: 'Please input the share password and we will return the share code, both of which will be used when sharing',
