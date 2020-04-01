@@ -177,10 +177,10 @@ function deleteDeck(svg) {
                 processData: false,
                 dataType: "json",
                 success: function (ret) {
-                    if (ret.status) {
+                    if (ret['status']) {
                         $(svg).parents('.items').remove()
                     } else {
-                        Oops(ret.data);
+                        Oops(ret['data']);
                     }
                 },
                 error: function () {

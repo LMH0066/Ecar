@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block page_css %}
+    <link href="/static/plugins/sweetalerts/sweetalert2.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/plugins/sweetalerts/sweetalert.css" rel="stylesheet" type="text/css"/>
+
     <link href="/static/StudyGroup/css/chat.css" rel="stylesheet" type="text/css"/>
 {% endblock %}
 
@@ -78,7 +81,7 @@
                                      stroke-linejoin="round" class="feather feather-message-square">
                                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                                 </svg>
-                                Click User To Chat
+                                Click Group To Chat
                             </p>
                         </div>
 
@@ -216,6 +219,8 @@
 {% endblock %}
 
 {% block page_js %}
+    <script src="/static/plugins/sweetalerts/sweetalert2.min.js"></script>
+
     <script src="/static/StudyGroup/js/chat.js"></script>
     <script src="/static/StudyGroup/js/forum.js"></script>
 {% endblock %}

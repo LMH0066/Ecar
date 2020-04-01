@@ -12,7 +12,6 @@ $('.user-list-box .person').on('click', function (event) {
     } else {
         let findChat = $(this).attr('data-chat');
         let personName = $(this).find('.user-name').text();
-        let personImage = $(this).find('img').attr('src');
         let hideTheNonSelectedContent = $(this).parents('.chat-system').find('.chat-box .chat-not-selected').hide();
         let showChatInnerContent = $(this).parents('.chat-system').find('.chat-box .chat-box-inner').show();
 
@@ -21,7 +20,7 @@ $('.user-list-box .person').on('click', function (event) {
         } else if (window.innerWidth > 767) {
             $('.chat-box .current-chat-user-name .name').html(personName);
         }
-        $('.chat-box .current-chat-user-name img').attr('src', personImage);
+        getChats(findChat);
         $('.chat').removeClass('active-chat');
         $('.user-list-box .person').removeClass('active');
         $('.chat-box .chat-box-inner').css('height', '100%');
@@ -66,3 +65,32 @@ $('.mail-write-box').on('keydown', function (event) {
 $('.hamburger, .chat-system .chat-box .chat-not-selected p').on('click', function (event) {
     $(this).parents('.chat-system').find('.user-list-box').toggleClass('user-list-box-show')
 });
+
+function getChats(findChat) {
+    let group_id = findChat.split('_')[1];
+    let form_data = new FormData();
+    form_data.append('group_id', group_id);
+    $.ajax({
+        url: "/group/GetChats",
+        type: "POST",
+        data: form_data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function (ret) {
+            if (ret['status']) {
+                let chat_container = $('#chat-conversation-box-scroll .chat[data-chat = ' + findChat + ']');
+                console.log(ret['data']);
+                for (let i = 0; i < ret['data'].length; i++) {
+
+                }
+            } else {
+                Oops(ret['data']);
+            }
+        },
+        error: function () {
+            Oops("");
+        }
+    })
+}

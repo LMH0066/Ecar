@@ -19,9 +19,7 @@ class StudyGroup(models.Model):
 class Chat(models.Model):
     chat_id = models.AutoField(primary_key=True)
     # 发言者
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ChatToFromUser" )
-    # 接收者
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ChatToToUser")
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ChatToFromUser")
     # 评论的Group
     group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE)
     # 内容
