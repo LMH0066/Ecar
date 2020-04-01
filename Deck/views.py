@@ -14,8 +14,10 @@ from Login.models import User
 from uuid import uuid4
 from itertools import chain
 
-
 # 访问卡组页面
+from StudyGroup.models import StudyGroup
+
+
 def go_deck(request):
     if not request.session.get('status'):
         return redirect("/auth/login_page")
@@ -117,8 +119,11 @@ def set_share_code(request):
     code = uuid4()
     new_share_info = ShareInfo(share_code=code, share_password=password, deck=deck)
     new_share_info.save()
+    new_study_group = StudyGroup(group_name=code, deck_id=deck.deck_id)
+    new_study_group.save()
     ret = {'status': True,
-           'data': {'share_id': new_share_info.share_id, 'share_code': str(code), 'share_password': password}}
+           'data': {'share_id': new_share_info.share_id, 'share_code': str(code), 'share_password': password,
+                    'study_group': new_study_group.group_id}}
     return HttpResponse(json.dumps(ret))
 
 
