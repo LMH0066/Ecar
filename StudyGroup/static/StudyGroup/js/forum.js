@@ -4,7 +4,7 @@ $(function () {
     sg_a.attr("data-active",true);
     $('#sg_ul').addClass("show");
     $('#forum_li').addClass("active");
-    // getStudyGroup();
+    getStudyGroup();
 });
 
 function getStudyGroup() {
@@ -32,7 +32,7 @@ function getStudyGroup() {
 
 function addGroup(data) {
     $('.people').append($("" +
-        "<div class='person' data-chat='group_"+ data['group_id'] +"'>" +
+        "<div class='person' data-chat='group_"+ data['group_id'] +"' onclick='showChat(this)'>" +
         "   <div class='user-info'>" +
         "       <div class='f-body'>" +
         "           <div class='meta-info'>" +

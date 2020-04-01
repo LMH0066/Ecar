@@ -11,7 +11,7 @@ class StudyGroup(models.Model):
     # 关联卡组
     deck_id = models.IntegerField()
     # 人数
-    people_num = models.IntegerField(default=1)
+    people_num = models.IntegerField(default=2)
     # 创建时间
     c_time = models.DateTimeField(auto_now_add=True)
 

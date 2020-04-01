@@ -11,13 +11,12 @@ from django.views.decorators.csrf import csrf_exempt
 from Card.models import Card, MemoryInfo
 from Deck.models import Deck, DeckInfo, ShareInfo, CopyInfo
 from Login.models import User
+from StudyGroup.models import StudyGroup, Chat
 from uuid import uuid4
 from itertools import chain
 
+
 # 访问卡组页面
-from StudyGroup.models import StudyGroup
-
-
 def go_deck(request):
     if not request.session.get('status'):
         return redirect("/auth/login_page")
@@ -74,12 +73,9 @@ def get_decks(request):
     if not request.session.get('status'):
         return redirect("/auth/login_page")
     user_name = request.session['username']
-    # 获取该用户创建的所有卡组 creator_decks, admin_decks, staff_decks
     user = User.objects.get(user_name=user_name)
-    creator_decks = user.deck_set.filter(is_public=False)
-    admin_decks = user.AdminsToDeck.filter(is_public=False).difference(creator_decks)
-    staff_decks = user.StaffsToDeck.filter(is_public=False).difference(admin_decks).difference(creator_decks)
-    decks = chain(creator_decks, admin_decks, staff_decks)
+    decks = get_more_decks(request)
+
     my_decks = []
     for deck in decks:
         review_nums = MemoryInfo.objects.filter(user__user_name=user_name,
@@ -119,11 +115,8 @@ def set_share_code(request):
     code = uuid4()
     new_share_info = ShareInfo(share_code=code, share_password=password, deck=deck)
     new_share_info.save()
-    new_study_group = StudyGroup(group_name=code, deck_id=deck.deck_id)
-    new_study_group.save()
-    ret = {'status': True,
-           'data': {'share_id': new_share_info.share_id, 'share_code': str(code), 'share_password': password,
-                    'study_group': new_study_group.group_id}}
+    ret = {'status': True, 'data': {'share_id': new_share_info.share_id,
+                                    'share_code': str(code), 'share_password': password}}
     return HttpResponse(json.dumps(ret))
 
 
@@ -193,11 +186,18 @@ def share_deck(request):
     except:
         ret['status'] = False
         return HttpResponse(json.dumps(ret))
+
     deck = share_info.deck
     deck.staffs.add(user)
     deck.save()
     new_deck_info = DeckInfo(deck=deck, user=user)
     new_deck_info.save()
+
+    group = StudyGroup.objects.filter(deck_id=deck.deck_id)
+    if not group.exists():
+        new_study_group = StudyGroup(group_name=code, deck_id=deck.deck_id)
+        new_study_group.save()
+
     ret['data'] = {'deck_name': deck.name, 'deck_id': deck.deck_id, 'deck_amount': deck.amount}
     return HttpResponse(json.dumps(ret))
 
@@ -230,18 +230,16 @@ def copy_deck(request):
     return HttpResponse(json.dumps(ret))
 
 
-# 测试，返回多种权限的deck
-@csrf_exempt
+# 返回多种权限的deck
 def get_more_decks(request):
-    if not request.session.get('status'):
-        return redirect("/auth/login_page")
     user_name = request.session['username']
     # 获取该用户创建的所有卡组 creator_decks, admin_decks, staff_decks
     user = User.objects.get(user_name=user_name)
-    creator_decks = user.deck_set.all()
-    admin_decks = user.AdminsToDeck.all().difference(creator_decks)
-    staff_decks = user.StaffsToDeck.all().difference(admin_decks).difference(creator_decks)
-    return HttpResponse(json.dumps({'status': True}))
+    creator_decks = user.deck_set.filter(is_public=False)
+    admin_decks = user.AdminsToDeck.filter(is_public=False).difference(creator_decks)
+    staff_decks = user.StaffsToDeck.filter(is_public=False).difference(admin_decks).difference(creator_decks)
+    decks = chain(creator_decks, admin_decks, staff_decks)
+    return decks
 
 
 # 定时任务，重设review_nums

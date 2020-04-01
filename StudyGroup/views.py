@@ -12,6 +12,8 @@ from Deck.models import Deck
 from Login.models import User
 from StudyGroup.models import StudyGroup, Chat
 
+from Deck.views import get_more_decks
+
 
 def go_forum(request):
     if not request.session.get('status'):
@@ -19,20 +21,15 @@ def go_forum(request):
     return render(request, 'StudyGroup/forum.html')
 
 
-# 获得所有组
+# 获得所有学习小组
 @csrf_exempt
 def get_study_group(request):
-    user_name = request.session['username']
-    user = User.objects.get(user_name=user_name)
-
-    creator_decks = user.deck_set.filter(is_public=False)
-    admin_decks = user.AdminsToDeck.filter(is_public=False).difference(creator_decks)
-    staff_decks = user.StaffsToDeck.filter(is_public=False).difference(admin_decks).difference(creator_decks)
-    decks = chain(creator_decks, admin_decks, staff_decks)
+    decks = get_more_decks(request)
     my_study_group = []
     for deck in decks:
-        study_group = StudyGroup.objects.filter(deck_id=deck.deck_id)
-        if study_group.exists():
+        study_groups = StudyGroup.objects.filter(deck_id=deck.deck_id)
+        if study_groups.exists():
+            study_group = study_groups.first()
             my_study_group.append(
                 {'group_id': study_group.group_id, 'group_name': study_group.group_name,
                  'people_num': study_group.people_num, 'deck_name': deck.name}
@@ -73,6 +70,8 @@ def get_group_members(request):
 def get_chats(request):
     user_name = request.session['username']
     group_id = request.POST.get('group_id')
+    request.session['group_id'] = group_id
+
     ret = {'status': True}
     chats = Chat.objects.filter(Q(group_id=group_id)).order_by('c_time')
     if chats.exists():
@@ -103,8 +102,8 @@ def get_chats(request):
 def chat_group(request):
     user = User.objects.get(user_name=request.session['username'])
     study_group = StudyGroup.objects.get(group_id=request.session['group_id'])
-    context = request.POST.get('context')
-    new_chat = Chat(user=user, context=context, group=study_group)
+    content = request.POST.get('content')
+    new_chat = Chat(from_user=user, content=content, group=study_group)
     new_chat.save()
 
     if user.avatar:
