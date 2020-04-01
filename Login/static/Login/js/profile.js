@@ -15,6 +15,7 @@ $(function () {
 
     getAuthorDeck();
     initCardTable();
+    showLearningLine();
 });
 
 function getAuthorDeck() {
@@ -54,7 +55,7 @@ function showDeck(data) {
         "                           <p>Card Amount：" + data['card_amount'] + "</p>" +
         "                           <p>Last modified：" + data['c_time'] + "</p>" +
         "                           <p hidden class='public_id'>" + data['public_deck_id'] + "</p>" +
-                                    btn_delete_deck +
+        btn_delete_deck +
         "                       </div>" +
         "                   </div>" +
         "               </div>"));
@@ -108,4 +109,48 @@ function deletePublicDeck(svg) {
             })
         }
     })
+}
+
+function showLearningLine() {
+    let sLineArea = {
+        chart: {
+            height: 350,
+            type: 'area',
+            toolbar: {
+                show: false,
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            curve: 'smooth'
+        },
+        series: [{
+            name: 'study nums',
+            data: [31, 40, 28, 51, 42, 109, 100]
+        }, {
+            name: 'review nums',
+            data: [11, 32, 45, 32, 34, 52, 41]
+        }],
+
+        xaxis: {
+            type: 'datetime',
+            categories: ["2018-09-19T00:00:00", "2018-09-19T01:30:00",
+                "2018-09-19T02:30:00", "2018-09-19T03:30:00",
+                "2018-09-19T04:30:00", "2018-09-19T05:30:00", "2018-09-19T06:30:00"],
+        },
+        tooltip: {
+            x: {
+                format: 'dd/MM/yy HH:mm'
+            },
+        }
+    };
+
+    let chart = new ApexCharts(
+        document.querySelector("#s-line-area"),
+        sLineArea
+    );
+
+    chart.render();
 }
