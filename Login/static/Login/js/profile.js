@@ -43,7 +43,7 @@ function getAuthorDeck() {
 
 function showDeck(data) {
     let $deck_box = $('.bio-deck-box .row');
-    $deck_box.append($("<div class='col-12 col-xl-6 col-lg-12 mb-xl-5 b-deck'" +
+    $deck_box.append($("<div class='col-12 col-xl-6 col-lg-12 mb-5 b-deck'" +
         "                  onclick='showCards(" + data['deck_name'] + ", " + data['deck_id'] + ")'" +
         "                  data-target='#cardModal' data-toggle='modal'>" +
         "                   <div class='d-flex b-skills'>" +
