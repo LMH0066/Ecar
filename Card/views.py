@@ -67,6 +67,7 @@ def add_card(request):
                                      card_id=new_card.card_id)
         new_memory_info.save()
         deck.amount = deck.amount + 1
+        deck.need_review_nums = deck.need_review_nums + 1
         deck.save()
         ret['data'] = {'deck_name': deck.name, 'card_amount': deck.amount}
     else:
