@@ -175,7 +175,7 @@ def download_deck(request):
     ret = {'status': True}
     count = Deck.objects.filter(creator=user, name=deck.name).count()
     if count != 0:
-        deck_name = deck.name + "___" + str(uuid4())
+        deck_name = deck.name + "---" + str(uuid4())
     else:
         deck_name = deck.name
     new_deck = Deck(name=deck_name, amount=deck.amount, creator=user)
