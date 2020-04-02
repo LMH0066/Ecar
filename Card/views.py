@@ -39,7 +39,7 @@ def get_cards(request):
         for i in cards:
             cards_front_text.append(i.q_text)
             cards_back_text.append(i.ans_text)
-        ret['data'] = {'front_text': cards_front_text, 'back_text': cards_back_text}
+        ret['data'] = {'deck_name': deck.name, 'front_text': cards_front_text, 'back_text': cards_back_text}
     return HttpResponse(json.dumps(ret))
 
 

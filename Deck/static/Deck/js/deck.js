@@ -67,7 +67,7 @@ function addDeck(deck_id, deck_name, amount, need_review_amout) {
     let deck_html = $("<div class='col-xl-3 col-lg-3 col-md-6 col-sm-6 items' style='--cards:" + show_amount + ";'>" +
         "                  <div class='card'>" +
         "                      <div class='child' data-target='#cardModal' data-toggle='modal'" +
-        "                       onclick='showCards(" + deck_name + ", " + deck_id + ")' id='" + deck_id + "'>" +
+        "                       onclick='showCards(" + deck_id + ")' id='" + deck_id + "'>" +
         "                          <h3>" + deck_name + "</h3>" +
         "                          <p>" + amount + " cards(" + need_review_amout + ")</p>" +
         "                          <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' onclick='deleteDeck(this)'" +

@@ -230,7 +230,7 @@ function showDeckComments() {
 function showDetail(data) {
     // console.log(data);
     public_deck_id = data.public_id;
-    showCards(data['name'], data['deck_id']);
+    showCards(data['deck_id']);
     $('#animated-card-tab').click();
     $('#cardModal').modal('show');
 }

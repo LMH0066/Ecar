@@ -173,11 +173,16 @@ def download_deck(request):
     public_deck = PublicDecks.objects.get(public_id=request.POST.get('public_id'))
     deck = Deck.objects.get(deck_id=public_deck.deck_id)
     ret = {'status': True}
+
     count = Deck.objects.filter(creator=user, name=deck.name).count()
-    if count != 0:
-        deck_name = deck.name + " " + str(uuid4())
-    else:
-        deck_name = deck.name
+    deck_name = deck.name
+    num = 0
+    while count != 0:
+        num = num + 1
+        deck_name = deck.name + "_" + str(num)
+        print(deck_name)
+        count = Deck.objects.filter(creator=user, name=deck_name).count()
+
     new_deck = Deck(name=deck_name, amount=deck.amount, creator=user)
     new_deck.save()
     new_deck_info = DeckInfo(deck=new_deck, user=user)

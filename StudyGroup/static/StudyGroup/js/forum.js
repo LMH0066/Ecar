@@ -54,7 +54,7 @@ function showGroupCards() {
     let $group = $('.user-list-box .person').filter('.active');
     let deck_id = $group.attr('data-deck-id'),
         deck_name = $group.find('.deck-name').attr('data-deck-name');
-    showCards(deck_name, deck_id);
+    showCards(deck_id);
 }
 
 function deckShare() {
