@@ -82,28 +82,11 @@ def get_decks(request):
                                                 card__deck__deck_id=deck.deck_id,
                                                 review_time__lte=datetime.date.today(),
                                                 memory_times__gt=0).count()
-        review_nums += deck.need_review_nums - DeckInfo.objects.get(user__user_id=user.user_id,
-                                                                    deck__deck_id=deck.deck_id).now_review_nums
+        deck_info = DeckInfo.objects.get(user__user_id=user.user_id, deck__deck_id=deck.deck_id)
+        review_nums += deck.today_learn_nums + deck_info.need_review_nums - deck_info.now_review_nums
         my_decks.append(
             {'deck_id': deck.deck_id, 'deck_name': deck.name, 'card_amount': deck.amount, 'review_nums': review_nums})
     ret = {'status': True, 'data': my_decks}
-    return HttpResponse(json.dumps(ret))
-
-
-# 修改卡组每日记忆数
-@csrf_exempt
-def set_need_review_nums(request):
-    deck = Deck.objects.get(deck_id=request.session['deck_id'])
-    new_nums = request.POST.get('review_nums')
-    max_nums = deck.amount
-    ret = {'status': True}
-    if new_nums <= max_nums:
-        if new_nums < max_nums:
-            deck.need_review_nums = new_nums
-            deck.save()
-    else:
-        ret['status'] = False
-        ret['data'] = "Review nums greater than deck amount"
     return HttpResponse(json.dumps(ret))
 
 
@@ -190,8 +173,14 @@ def share_deck(request):
     deck = share_info.deck
     deck.staffs.add(user)
     deck.save()
-    new_deck_info = DeckInfo(deck=deck, user=user)
+    new_deck_info = DeckInfo(deck=deck, user=user, need_review_nums=deck.amount - deck.today_learn_nums)
     new_deck_info.save()
+    # 卡片的复习信息也要创建
+    cards = deck.card_set.all()
+    for card in cards:
+        new_memory_info = MemoryInfo(user_id=user.user_id, card_id=card.card_id,
+                                     review_time=datetime.date.today())
+        new_memory_info.save()
 
     group = StudyGroup.objects.filter(deck_id=deck.deck_id)
     if not group.exists():
@@ -215,7 +204,7 @@ def copy_deck(request):
         ret['data'] = 'Can not find the deck by code'
         return HttpResponse(json.dumps(ret))
     deck = copy_info.deck
-    new_deck = Deck(name=deck.name, amount=deck.amount, creator=user)
+    new_deck = Deck(name=deck.name, amount=deck.amount, creator=user, today_learn_nums=deck.amount)
     new_deck.save()
     new_deck_info = DeckInfo(deck=new_deck, user=user)
     new_deck_info.save()
@@ -243,8 +232,22 @@ def get_more_decks(request):
 
 
 # 定时任务，重设review_nums
-def reset_now_review_nums():
-    MemoryInfo.objects.update(now_review_nums=0)
+def reset_review():
+    # DeckInfo相关操作
+    DeckInfo.objects.update(now_review_nums=0)
+    deck_infos = DeckInfo.objects.all()
+    for deck_info in deck_infos:
+        deck = deck_info.deck
+        review_infos_count = MemoryInfo.objects.filter(user__user_name=deck_info.user.user_name,
+                                                       card__deck__deck_id=deck.deck_id,
+                                                       review_time=datetime.date.today()).count()
+        # print(review_infos_count)
+        # print(deck_info.deck.today_learn_nums)
+        # print(deck_info.need_review_nums)
+        deck_info.need_review_nums += deck.today_learn_nums + review_infos_count
+        deck_info.save()
+    # Deck相关操作
+    Deck.objects.update(today_learn_nums=0)
 
 
 # 定时任务，删除过期邀请码

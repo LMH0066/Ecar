@@ -19,8 +19,8 @@ class Deck(models.Model):
     admins = models.ManyToManyField(User, related_name='AdminsToDeck')
     # 卡组用户
     staffs = models.ManyToManyField(User, related_name='StaffsToDeck')
-    # 单次需要复习个数
-    need_review_nums = models.IntegerField(default=0)
+    # 今天新学习的个数
+    today_learn_nums = models.IntegerField(default=0)
     # 是否是public_deck
     is_public = models.BooleanField(default=False)
 
@@ -30,10 +30,14 @@ class Deck(models.Model):
 
 class DeckInfo(models.Model):
     info_id = models.AutoField(primary_key=True)
+    # 今天需要复习的个数
+    need_review_nums = models.IntegerField(default=0)
     # 卡组已记忆卡片数
     memory_count = models.IntegerField(default=0)
     # 本日已经复习个数
     now_review_nums = models.IntegerField(default=0)
+    # 单次复习的卡片数
+    single_number = models.IntegerField(default=20)
     # 所属卡组
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name="DeckInfoToDeck")
     # 所属用户

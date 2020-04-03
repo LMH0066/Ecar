@@ -127,7 +127,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "Card", "static"),
     os.path.join(BASE_DIR, "static"),
 )
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+STATIC_ROOT = os.path.join(BASE_DIR, "/static/")
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_NAME = "sessionid"
@@ -143,7 +143,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CRONJOBS = (
-    ('0 0 * * *', 'Deck.views.reset_now_review_nums'),
+    ('0 0 * * *', 'Deck.views.reset_review'),
     ('0 0 * * *', 'Deck.views.delete_old_code')
 )
 

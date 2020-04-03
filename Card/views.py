@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.forms.models import model_to_dict
 from django.core import serializers
+from itertools import chain
 
 from Card.models import Card, MemoryInfo
 from Deck.models import Deck, DeckInfo
@@ -55,19 +56,18 @@ def add_card(request):
     if (user.user_id == deck.creator.user_id or
             user in deck.admins.all()):
         # 判断是否有重名卡片
-        cards = deck.card_set.all()
-        for card in cards:
-            if card.q_text == front_text:
-                ret['status'] = False
-                ret['data'] = 'Already has a Card with the same question'
-                return HttpResponse(json.dumps(ret))
+        card = deck.card_set.filter(q_text=front_text)
+        if card:
+            ret['status'] = False
+            ret['data'] = 'Already has a Card with the same question'
+            return HttpResponse(json.dumps(ret))
         new_card = Card(q_text=front_text, ans_text=back_text, deck=deck)
         new_card.save()
-        new_memory_info = MemoryInfo(user_id=User.objects.get(user_name=request.session['username']).user_id,
-                                     card_id=new_card.card_id)
+        new_memory_info = MemoryInfo(user_id=user.user_id, card_id=new_card.card_id,
+                                     review_time=datetime.date.today())
         new_memory_info.save()
         deck.amount = deck.amount + 1
-        deck.need_review_nums = deck.need_review_nums + 1
+        deck.today_learn_nums = deck.today_learn_nums + 1
         deck.save()
         ret['data'] = {'deck_name': deck.name, 'card_amount': deck.amount}
     else:
@@ -87,10 +87,23 @@ def remove_card(request):
     # 需要admin以上权限
     if (user.user_id == card.deck.creator.user_id or
             user in card.deck.admins.all()):
-        Card.objects.filter(card_id=card.card_id).delete()
-        if deck.amount > 1:
-            if deck.need_review_nums >= deck.amount:
-                deck.need_review_nums = deck.amount - 1;
+        if deck.amount >= 1:
+            try:
+                delete_card = Card.objects.get(card_id=card.card_id)
+                # 如果这张卡片是今天创建的，那么今天新学习数 - 1
+                if delete_card.c_time.today() == datetime.date.today():
+                    deck.today_learn_nums = max(0, deck.today_learn_nums - 1)
+                else:
+                    memory_info = MemoryInfo.objects.get(card_id=delete_card.card_id, user__user_name=user.user_name)
+                    # 如果这张卡是今天需要复习的,且还没有复习,那么今天需要复习的卡片数-1
+                    if memory_info.review_time.today() == datetime.date.today():
+                        deck_info = DeckInfo.objects.get(deck=deck, user__user_name=user.user_name)
+                        deck_info.need_review_nums = max(0, deck_info.need_review_nums - 1)
+                delete_card.delete()
+            except:
+                ret['status'] = False
+                ret['data'] = 'The card was not found'
+
             deck.amount -= 1
             deck.save()
             ret['data'] = {'deck_name': deck.name, 'card_amount': deck.amount}
@@ -148,37 +161,61 @@ def get_memory_card(request):
         ret['status'] = False
         ret['data'] = "Deck have no card"
         return HttpResponse(json.dumps(ret))
-    review_nums = deck.need_review_nums - DeckInfo.objects.get(user__user_name=user_name,
-                                                               deck__deck_id=deck_id).now_review_nums
-    infos = MemoryInfo.objects.filter(user__user_name=user_name,
-                                      card__deck__deck_id=deck_id,
-                                      review_time__lte=datetime.date.today(),
-                                      memory_times__gt=0).order_by('?')
-    # 复习
-    if infos.exists():
+    deck_info = DeckInfo.objects.get(user__user_name=user_name, deck__deck_id=deck_id)
+    review_nums = deck.today_learn_nums + deck_info.need_review_nums - deck_info.now_review_nums
+    # 本次需要复习的数量
+    single_nums = min(deck_info.single_number, review_nums)
+    # 待复习的卡片信息
+    review_infos = MemoryInfo.objects.filter(user__user_name=user_name,
+                                             card__deck__deck_id=deck_id,
+                                             review_time__lte=datetime.date.today(),
+                                             memory_times__gt=0).order_by('?')
+    # 新学习但是学习当天没有复习的卡片
+    new_infos = MemoryInfo.objects.filter(user__user_name=user_name,
+                                          card__deck__deck_id=deck_id,
+                                          memory_times=0).order_by('?')
+    infos = chain(review_infos, new_infos)
+    if review_infos.count() + new_infos.count() > single_nums:
+        infos = infos[:single_nums]
         for info in infos:
             memory_cards.append(info.card)
-    # 新卡片
+    elif infos:
+        for info in infos:
+            memory_cards.append(info.card)
     else:
+        ret['status'] = False
+        ret['data'] = "No Card To Learn"
+        return HttpResponse(json.dumps(ret))
 
-        max_nums = MemoryInfo.objects.filter(user__user_name=user_name,
-                                             card__deck__deck_id=deck_id,
-                                             memory_times=0).count()
-        if review_nums > max_nums:
-            infos = MemoryInfo.objects.filter(user__user_name=user_name,
-                                              card__deck__deck_id=deck_id,
-                                              memory_times=0).order_by('?')
-        else:
-            infos = MemoryInfo.objects.filter(user__user_name=user_name,
-                                              card__deck__deck_id=deck_id,
-                                              memory_times=0).order_by('?')[:review_nums]
-        if infos.exists():
-            for info in infos:
-                memory_cards.append(info.card)
-        else:
-            ret['status'] = False
-            ret['data'] = "No Card To Learn"
-            return HttpResponse(json.dumps(ret))
+    # infos = MemoryInfo.objects.filter(user__user_name=user_name,
+    #                                   card__deck__deck_id=deck_id,
+    #                                   review_time__lte=datetime.date.today(),
+    #                                   memory_times__gt=0).order_by('?')
+    # # 复习
+    # if infos.exists():
+    #     for info in infos:
+    #         memory_cards.append(info.card)
+    # # 新卡片
+    # else:
+    #
+    #     max_nums = MemoryInfo.objects.filter(user__user_name=user_name,
+    #                                          card__deck__deck_id=deck_id,
+    #                                          memory_times=0).count()
+    #     if review_nums > max_nums:
+    #         infos = MemoryInfo.objects.filter(user__user_name=user_name,
+    #                                           card__deck__deck_id=deck_id,
+    #                                           memory_times=0).order_by('?')
+    #     else:
+    #         infos = MemoryInfo.objects.filter(user__user_name=user_name,
+    #                                           card__deck__deck_id=deck_id,
+    #                                           memory_times=0).order_by('?')[:review_nums]
+    #     if infos.exists():
+    #         for info in infos:
+    #             memory_cards.append(info.card)
+    #     else:
+    #         ret['status'] = False
+    #         ret['data'] = "No Card To Learn"
+    #         return HttpResponse(json.dumps(ret))
     memory_cards = serializers.serialize("json", memory_cards)
     ret = {'status': True, 'data': json.loads(memory_cards)}
     return HttpResponse(json.dumps(ret))
@@ -204,6 +241,7 @@ def remember_card(request):
     memory_info.now_correct_times += 1
     if memory_info.now_correct_times >= memory_info.need_correct_times:
         deck_info = DeckInfo.objects.get(user__user_name=user_name, deck_id=deck_id)
+        deck_info.need_review_nums = max(0, deck_info.need_review_nums - 1)
         # 清零
         memory_info.now_correct_times = 0
         memory_info.last_memory_time = datetime.date.today()
