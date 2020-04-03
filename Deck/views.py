@@ -78,12 +78,8 @@ def get_decks(request):
 
     my_decks = []
     for deck in decks:
-        review_nums = MemoryInfo.objects.filter(user__user_name=user_name,
-                                                card__deck__deck_id=deck.deck_id,
-                                                review_time__lte=datetime.date.today(),
-                                                memory_times__gt=0).count()
         deck_info = DeckInfo.objects.get(user__user_id=user.user_id, deck__deck_id=deck.deck_id)
-        review_nums += deck.today_learn_nums + deck_info.need_review_nums - deck_info.now_review_nums
+        review_nums = deck.today_learn_nums + deck_info.need_review_nums - deck_info.now_review_nums
         my_decks.append(
             {'deck_id': deck.deck_id, 'deck_name': deck.name, 'card_amount': deck.amount, 'review_nums': review_nums})
     ret = {'status': True, 'data': my_decks}
