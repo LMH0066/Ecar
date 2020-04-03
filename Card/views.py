@@ -66,9 +66,11 @@ def add_card(request):
         new_memory_info = MemoryInfo(user_id=user.user_id, card_id=new_card.card_id,
                                      review_time=datetime.date.today())
         new_memory_info.save()
-        deck.amount = deck.amount + 1
-        deck.today_learn_nums = deck.today_learn_nums + 1
+        deck.amount += 1
+        deck.today_learn_nums += 1
         deck.save()
+        deck_info = DeckInfo.objects.get(user__user_id=user.user_id, deck__deck_id=deck.deck_id)
+        deck_info.need_review_nums += 1
         ret['data'] = {'deck_name': deck.name, 'card_amount': deck.amount}
     else:
         ret['status'] = False
@@ -93,12 +95,12 @@ def remove_card(request):
                 # 如果这张卡片是今天创建的，那么今天新学习数 - 1
                 if delete_card.c_time.today() == datetime.date.today():
                     deck.today_learn_nums = max(0, deck.today_learn_nums - 1)
-                else:
-                    memory_info = MemoryInfo.objects.get(card_id=delete_card.card_id, user__user_name=user.user_name)
-                    # 如果这张卡是今天需要复习的,且还没有复习,那么今天需要复习的卡片数-1
-                    if memory_info.review_time.today() == datetime.date.today():
-                        deck_info = DeckInfo.objects.get(deck=deck, user__user_name=user.user_name)
-                        deck_info.need_review_nums = max(0, deck_info.need_review_nums - 1)
+
+                memory_info = MemoryInfo.objects.get(card_id=delete_card.card_id, user__user_name=user.user_name)
+                # 如果这张卡是今天需要复习的,且还没有复习,那么今天需要复习的卡片数-1
+                if memory_info.review_time.today() == datetime.date.today():
+                    deck_info = DeckInfo.objects.get(deck=deck, user__user_name=user.user_name)
+                    deck_info.need_review_nums = max(0, deck_info.need_review_nums - 1)
                 delete_card.delete()
             except:
                 ret['status'] = False
@@ -162,7 +164,7 @@ def get_memory_card(request):
         ret['data'] = "Deck have no card"
         return HttpResponse(json.dumps(ret))
     deck_info = DeckInfo.objects.get(user__user_name=user_name, deck__deck_id=deck_id)
-    review_nums = deck.today_learn_nums + deck_info.need_review_nums - deck_info.now_review_nums
+    review_nums = deck_info.need_review_nums - deck_info.now_review_nums
     # 本次需要复习的数量
     single_nums = min(deck_info.single_number, review_nums)
     # 待复习的卡片信息

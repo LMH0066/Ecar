@@ -79,7 +79,7 @@ def get_decks(request):
     my_decks = []
     for deck in decks:
         deck_info = DeckInfo.objects.get(user__user_id=user.user_id, deck__deck_id=deck.deck_id)
-        review_nums = deck.today_learn_nums + deck_info.need_review_nums - deck_info.now_review_nums
+        review_nums = deck_info.need_review_nums - deck_info.now_review_nums
         my_decks.append(
             {'deck_id': deck.deck_id, 'deck_name': deck.name, 'card_amount': deck.amount, 'review_nums': review_nums})
     ret = {'status': True, 'data': my_decks}
@@ -169,7 +169,7 @@ def share_deck(request):
     deck = share_info.deck
     deck.staffs.add(user)
     deck.save()
-    new_deck_info = DeckInfo(deck=deck, user=user, need_review_nums=deck.amount - deck.today_learn_nums)
+    new_deck_info = DeckInfo(deck=deck, user=user, need_review_nums=deck.amount)
     new_deck_info.save()
     # 卡片的复习信息也要创建
     cards = deck.card_set.all()
@@ -202,7 +202,7 @@ def copy_deck(request):
     deck = copy_info.deck
     new_deck = Deck(name=deck.name, amount=deck.amount, creator=user, today_learn_nums=deck.amount)
     new_deck.save()
-    new_deck_info = DeckInfo(deck=new_deck, user=user)
+    new_deck_info = DeckInfo(deck=new_deck, user=user, need_review_nums=deck.amount)
     new_deck_info.save()
     cards = Card.objects.filter(deck=deck)
     for card in cards:
@@ -240,7 +240,7 @@ def reset_review():
         # print(review_infos_count)
         # print(deck_info.deck.today_learn_nums)
         # print(deck_info.need_review_nums)
-        deck_info.need_review_nums += deck.today_learn_nums + review_infos_count
+        deck_info.need_review_nums += review_infos_count
         deck_info.save()
     # Deck相关操作
     Deck.objects.update(today_learn_nums=0)
