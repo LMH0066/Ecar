@@ -107,7 +107,10 @@ def chat_group(request):
 def update_chat_message(request):
     study_group = StudyGroup.objects.get(group_id=request.session['group_id'])
     chat_id = request.POST.get('chat_id')
-    chats = study_group.chat_set.filter(chat_id__gt=chat_id)
+    if chat_id == 'undefined':
+        chats = study_group.chat_set.all()
+    else:
+        chats = study_group.chat_set.filter(chat_id__gt=chat_id)
     if chats:
         all_chats = return_chat(request, chats)
         return HttpResponse(json.dumps({'status': True, 'data': all_chats}))

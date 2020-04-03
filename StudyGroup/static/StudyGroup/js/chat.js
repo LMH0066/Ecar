@@ -131,7 +131,7 @@ function sendChat(content, chatInput) {
 
 function updateChat() {
     let $chat = $('.active-chat');
-    if ($chat.length > 0 && $chat.children().length > 0) {
+    if ($chat.length > 0) {
         let chat_id = $chat.children("div:last-child").attr('data-chat-id');
         let form_data = new FormData();
         form_data.append('chat_id', chat_id);
