@@ -32,13 +32,13 @@ $(function () {
         // "searching": false,
         "ordering": false, // 禁止排序
         "columns": [
-            {data: "name"},
-            {data: "sharer"},
-            {data: "modified"},
-            {data: "notes"},
-            {data: "option"},
-            {data: "public_id", visible: false},
-            {data: "deck_id", visible: false}
+            {data: "name", sClass: "name"},
+            {data: "sharer", sClass: "sharer"},
+            {data: "modified", sClass: "modified"},
+            {data: "notes", sClass: "notes"},
+            {data: "option", sClass: "option"},
+            {data: "public_id", sClass: "public_id", visible: false},
+            {data: "deck_id", sClass: "deck_id", visible: false}
         ],
         "oLanguage": {
             "oPaginate": {
