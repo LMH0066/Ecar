@@ -48,9 +48,9 @@ function getChats(findChat) {
                 for (let i = 0; i < data.length; i++) {
                     let $messageHtml;
                     if (data[i]['from_is_me']) {
-                        $messageHtml = '<div class="bubble me">' + data[i]['content'] + '</div>';
+                        $messageHtml = '<div data-chat-id="' + data[i]['chat_id'] + '" class="bubble me">' + data[i]['content'] + '</div>';
                     } else {
-                        $messageHtml = '<div class="bubble you">' + data[i]['content'] + '</div>';
+                        $messageHtml = '<div data-chat-id="' + data[i]['chat_id'] + '" class="bubble you">' + data[i]['content'] + '</div>';
                     }
                     $('.mail-write-box').parents('.chat-system').find('.active-chat').append($messageHtml);
                 }
@@ -114,7 +114,7 @@ function sendChat(content, chatInput) {
         dataType: "json",
         success: function (ret) {
             if (ret['status']) {
-                let $messageHtml = '<div class="bubble me">' + content + '</div>';
+                let $messageHtml = '<div data-chat-id="' + ret['data']['chat_id'] + '" class="bubble me">' + content + '</div>';
                 chatInput.parents('.chat-system').find('.active-chat').append($messageHtml);
                 const getScrollContainer = document.querySelector('.chat-conversation-box');
                 getScrollContainer.scrollTop = getScrollContainer.scrollHeight;
@@ -127,4 +127,41 @@ function sendChat(content, chatInput) {
             Oops("");
         }
     })
+}
+
+function updateChat() {
+    let $chat = $('.active-chat');
+    if ($chat.length > 0) {
+        let chat_id = $chat.children("div:last-child").attr('data-chat-id');
+        let form_data = new FormData();
+        form_data.append('chat_id', chat_id);
+        $.ajax({
+            url: "/group/UpdateChatMessage",
+            type: "POST",
+            data: form_data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            success: function (ret) {
+                if (ret['status']) {
+                    let data = ret['data'];
+                    for (let i = 0; i < data.length; i++) {
+                        let $messageHtml;
+                        if (data[i]['from_is_me']) {
+                            $messageHtml = '<div data-chat-id="' + data[i]['chat_id'] + '" class="bubble me">' + data[i]['content'] + '</div>';
+                        } else {
+                            $messageHtml = '<div data-chat-id="' + data[i]['chat_id'] + '" class="bubble you">' + data[i]['content'] + '</div>';
+                        }
+                        $('.mail-write-box').parents('.chat-system').find('.active-chat').append($messageHtml);
+                    }
+                    const getScrollContainer = document.querySelector('.chat-conversation-box');
+                    getScrollContainer.scrollTop = getScrollContainer.scrollHeight;
+                }
+            },
+            error: function () {
+                Oops("");
+            }
+        })
+    }
 }

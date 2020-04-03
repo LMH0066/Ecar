@@ -21,6 +21,7 @@ function getStudyGroup() {
                 for (let i = 0; i < ret['data'].length; i++) {
                     addGroup(ret['data'][i]);
                 }
+                setInterval(updateChat, 1000);
             } else {
                 Oops(ret['data']);
             }
