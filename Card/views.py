@@ -244,7 +244,6 @@ def remember_card(request):
     memory_info.now_correct_times += 1
     if memory_info.now_correct_times >= memory_info.need_correct_times:
         deck_info = DeckInfo.objects.get(user__user_name=user_name, deck_id=deck_id)
-        deck_info.need_review_nums = max(0, deck_info.need_review_nums - 1)
         # 清零
         memory_info.now_correct_times = 0
         memory_info.last_memory_time = datetime.date.today()

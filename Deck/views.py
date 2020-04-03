@@ -236,11 +236,11 @@ def reset_review():
         deck = deck_info.deck
         review_infos_count = MemoryInfo.objects.filter(user__user_name=deck_info.user.user_name,
                                                        card__deck__deck_id=deck.deck_id,
-                                                       review_time=datetime.date.today()).count()
+                                                       review_time__lte=datetime.date.today()).count()
         # print(review_infos_count)
         # print(deck_info.deck.today_learn_nums)
         # print(deck_info.need_review_nums)
-        deck_info.need_review_nums += review_infos_count
+        deck_info.need_review_nums = review_infos_count
         deck_info.save()
     # Deck相关操作
     Deck.objects.update(today_learn_nums=0)
