@@ -71,6 +71,7 @@ def add_card(request):
         deck.save()
         deck_info = DeckInfo.objects.get(user__user_id=user.user_id, deck__deck_id=deck.deck_id)
         deck_info.need_review_nums += 1
+        deck_info.save()
         ret['data'] = {'deck_name': deck.name, 'card_amount': deck.amount}
     else:
         ret['status'] = False
