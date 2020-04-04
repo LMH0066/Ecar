@@ -35,88 +35,6 @@
     opacity: .7;
 }
 
-#addListModal .modal-dialog {
-    max-width: 345px;
-}
-
-#addListModal .modal-content {
-    border: none;
-    box-shadow: 0px 0px 15px 1px rgba(113, 106, 202, 0.2);
-}
-
-#addListModal .compose-box h5 {
-    font-weight: 700;
-    font-size: 18px;
-    color: #3b3f5c;
-    text-align: center;
-    margin-bottom: 38px;
-}
-
-#addListModal .compose-box .list-title {
-    display: flex;
-}
-
-#addListModal .compose-box .list-title svg {
-    align-self: center;
-    font-size: 19px;
-    margin-right: 14px;
-    color: #1b55e2;
-    font-weight: 600;
-}
-
-#addListModal .compose-box .list-title input {
-    border: none;
-    padding: 10px 16px;
-    -webkit-box-shadow: 2px 5px 17px 0 rgba(31, 45, 61, .1);
-    box-shadow: 2px 5px 17px 0 rgba(31, 45, 61, .1);
-}
-
-#addListModal .compose-box .list-title input::-webkit-input-placeholder {
-    color: #acb0c3;
-    font-weight: 600;
-}
-
-#addListModal .compose-box .list-title input::-ms-input-placeholder {
-    color: #acb0c3;
-    font-weight: 600;
-}
-
-#addListModal .compose-box .list-title input::-moz-placeholder {
-    color: #acb0c3;
-    font-weight: 600;
-}
-
-#addListModal .modal-footer {
-    justify-content: center;
-    border: none;
-    padding: 23px 20px;
-}
-
-#addListModal .modal-footer .btn[data-dismiss="modal"] {
-    background-color: #fff;
-    color: #1b55e2;
-    font-weight: 700;
-    border: 1px solid #e0e6ed;
-    padding: 10px 25px;
-}
-
-#addListModal .modal-footer .edit-list {
-    background-color: #009688;
-    color: #fff;
-    font-weight: 600;
-    border: 1px solid #e0e6ed;
-    padding: 10px 25px;
-}
-
-#addListModal .modal-footer .btn.add-list {
-    background-color: #1b55e2;
-    color: #fff;
-    font-weight: 600;
-    border: 1px solid #e0e6ed;
-    padding: 10px 25px;
-}
-
-
 /*Add Task Modal*/
 
 #addTaskModal .compose-box h5 {
@@ -124,7 +42,8 @@
     font-size: 18px;
     color: #515365;
     text-align: center;
-    margin-bottom: 38px;
+    margin-top: 19px;
+    margin-bottom: 19px;
 }
 
 #addTaskModal .task-title {
@@ -733,4 +652,13 @@
     100% {
         background-position: 0 0;
     }
+}
+
+#review_nums_vertical::-ms-clear {
+    display: none;
+}
+
+input#review_nums_vertical {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
