@@ -149,7 +149,8 @@ function deleteDeck(svg) {
         ev.stopPropagation();
     }
 
-    let deck_name = $(svg).parent().children('h3').html();
+    let deck_id = $(svg).parent().attr('id');
+    console.log(deck_id);
     swal({
         title: 'Sure?',
         type: 'info',
@@ -167,7 +168,7 @@ function deleteDeck(svg) {
     }).then(function (result) {
         if (result.value) {
             let form_data = new FormData();
-            form_data.append('deck_name', deck_name);
+            form_data.append('deck_id', deck_id);
             $.ajax({
                 url: "/deck/DeleteDeck",
                 type: "POST",

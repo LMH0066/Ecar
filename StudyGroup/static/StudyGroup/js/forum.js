@@ -21,7 +21,6 @@ function getStudyGroup() {
                 for (let i = 0; i < ret['data'].length; i++) {
                     addGroup(ret['data'][i]);
                 }
-                setInterval(updateChat, 1000);
             } else {
                 Oops(ret['data']);
             }
@@ -53,8 +52,7 @@ function addGroup(data) {
 
 function showGroupCards() {
     let $group = $('.user-list-box .person').filter('.active');
-    let deck_id = $group.attr('data-deck-id'),
-        deck_name = $group.find('.deck-name').attr('data-deck-name');
+    let deck_id = $group.attr('data-deck-id');
     showCards(deck_id);
 }
 

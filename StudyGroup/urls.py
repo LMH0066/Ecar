@@ -3,8 +3,9 @@ from . import views
 
 app_name = 'StudyGroup'
 urlpatterns = [
-    # path('', views.go_home),
     path('forum', views.go_forum),
+    path('task_list', views.go_task_list),
+    path('assign_task', views.go_assign_task),
     path('GetStudyGroup', views.get_study_group),
     path('GetGroupMembers', views.get_group_members),
     path('GetChats', views.get_chats),

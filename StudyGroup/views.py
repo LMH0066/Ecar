@@ -22,6 +22,18 @@ def go_forum(request):
     return render(request, 'StudyGroup/forum.html')
 
 
+def go_task_list(request):
+    if not request.session.get('status'):
+        return redirect("/auth/login_page")
+    return render(request, 'StudyGroup/task_list.html')
+
+
+def go_assign_task(request):
+    if not request.session.get('status'):
+        return redirect("/auth/login_page")
+    return render(request, 'StudyGroup/assign_task.html')
+
+
 # 获得所有学习小组
 @csrf_exempt
 def get_study_group(request):

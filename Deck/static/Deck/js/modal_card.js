@@ -216,10 +216,10 @@ function showCards(deck_id) {
         processData: false,
         dataType: "json",
         success: function (result) {
+            let data = result['data'];
+            $('#cardModalCenterTitle').html(data['deck_name']);
             if (result['status']) {
                 // 卡组有卡片
-                let data = result['data'];
-                $('#cardModalCenterTitle').html(data['deck_name']);
                 table.clear();
                 for (let i = 0; i < data['front_text'].length; i++) {
                     table.row.add([data['front_text'][i], data['back_text'][i], other_options]).draw();

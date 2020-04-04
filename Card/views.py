@@ -33,6 +33,7 @@ def get_cards(request):
     ret = {'status': True}
     if deck.amount == 0:
         ret['status'] = False
+        ret['data'] = {'deck_name': deck.name}
     else:
         cards = deck.card_set.all()
         cards_front_text = []

@@ -28,9 +28,9 @@ def go_deck(request):
 def delete_deck(request):
     if not request.session.get('status'):
         return redirect("/auth/login_page")
-    deck_name = request.POST.get('deck_name')
+    deck_id = request.POST.get('deck_id')
     user = User.objects.get(user_name=request.session['username'])
-    deck = user.deck_set.get(name=deck_name)
+    deck = user.deck_set.get(deck_id=deck_id)
     ret = {'status': True}
     # 需要creator权限
     if user.user_id == deck.creator.user_id:

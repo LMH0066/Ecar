@@ -25,7 +25,9 @@ $('.mail-write-box').on('keydown', function (event) {
 $('.hamburger, .chat-system .chat-box .chat-not-selected p').on('click', function (event) {
     $(this).parents('.chat-system').find('.user-list-box').toggleClass('user-list-box-show')
 });
-
+// 用于判断是否正在轮循updateChat()
+let updateVal;
+// 以一次获取聊天信息
 function getChats(findChat) {
     let group_id = findChat.split('_')[1];
     let form_data = new FormData();
@@ -57,6 +59,10 @@ function getChats(findChat) {
                 const getScrollContainer = document.querySelector('.chat-conversation-box');
                 getScrollContainer.scrollTop = getScrollContainer.scrollHeight;
             }
+            if (updateVal) {
+                clearInterval(updateVal);
+            }
+            updateVal = setInterval(updateChat, 1000);
         },
         error: function () {
             Oops("");
