@@ -10,5 +10,13 @@ urlpatterns = [
     path('GetGroupMembers', views.get_group_members),
     path('GetChats', views.get_chats),
     path('ChatGroup', views.chat_group),
-    path('UpdateChatMessage', views.update_chat_message)
+    path('UpdateChatMessage', views.update_chat_message),
+    path('CreateTask', views.create_task),
+    path('UpdateTask', views.update_task),
+    path('UpdateTaskImportance', views.update_task_importance),
+    path('UpdateTaskUnimportance', views.update_task_unimportance),
+    path('UpdateTaskAccomplish', views.update_task_accomplish),
+    path('UpdateTaskFail', views.update_task_fail),
+    path('DeleteTask', views.delete_task),
+    path('GetTasks', views.get_tasks)
 ]

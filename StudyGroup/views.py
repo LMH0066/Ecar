@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from Deck.models import Deck
 from Login.models import User
-from StudyGroup.models import StudyGroup, Chat
+from StudyGroup.models import StudyGroup, Chat, Task
 
 from Deck.views import get_more_decks
 
@@ -150,3 +150,106 @@ def return_chat(request, chats):
              'from_is_me': from_is_me, 'chat_id': chat.chat_id}
         )
     return all_chats
+
+
+# 添加task
+@csrf_exempt
+def create_task(request):
+    user_name = request.session['username']
+    user = User.objects.get(user_name=user_name)
+    title = request.POST.get('title')
+    content = request.POST.get('content')
+    task = Task(user=user, title=title, content=content)
+    task.save()
+    ret = {'status': True,
+           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
+    return HttpResponse(json.dumps(ret))
+
+
+# 修改task
+@csrf_exempt
+def update_task(request):
+    task_id = User.objects.get('task_id')
+    new_title = request.POST.get('title')
+    new_content = request.POST.get('content')
+    task = Task.objects.get(task_id=task_id)
+    task.title = new_title
+    task.content = new_content
+    task.save()
+    ret = {'status': True,
+           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
+    return HttpResponse(json.dumps(ret))
+
+
+# 设为importance
+@csrf_exempt
+def update_task_importance(request):
+    task_id = User.objects.get('task_id')
+    task = Task.objects.get(task_id=task_id)
+    task.is_importance = True
+    task.save()
+    ret = {'status': True,
+           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
+    return HttpResponse(json.dumps(ret))
+
+
+# 设为unimportance
+@csrf_exempt
+def update_task_unimportance(request):
+    task_id = User.objects.get('task_id')
+    task = Task.objects.get(task_id=task_id)
+    task.is_importance = False
+    task.save()
+    ret = {'status': True,
+           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
+    return HttpResponse(json.dumps(ret))
+
+
+# 设为accomplish
+@csrf_exempt
+def update_task_accomplish(request):
+    task_id = User.objects.get('task_id')
+    task = Task.objects.get(task_id=task_id)
+    task.is_accomplish = True
+    task.save()
+    ret = {'status': True,
+           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
+    return HttpResponse(json.dumps(ret))
+
+
+# 设为fail
+@csrf_exempt
+def update_task_fail(request):
+    task_id = User.objects.get('task_id')
+    task = Task.objects.get(task_id=task_id)
+    task.is_accomplish = False
+    task.save()
+    ret = {'status': True,
+           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
+    return HttpResponse(json.dumps(ret))
+
+
+# 删除task
+@csrf_exempt
+def delete_task(request):
+    task_id = User.objects.get('task_id')
+    task = Task.objects.get(task_id=task_id)
+    task.delete()
+    ret = {'status': True}
+    return HttpResponse(json.dumps(ret))
+
+
+# 获取所有task
+@csrf_exempt
+def get_tasks(request):
+    user_name = request.session['username']
+    user = User.objects.get(user_name=user_name)
+    tasks = user.task_set.all()
+    my_tasks = []
+    for task in tasks:
+        my_tasks.append(
+            {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'is_importance': task.is_importance,
+             'is_accomplish': task.is_accomplish, 'c_time': task.c_time}
+        )
+    ret = {'status': True, 'data': my_tasks}
+    return HttpResponse(json.dumps(ret))

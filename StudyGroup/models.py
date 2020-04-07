@@ -26,3 +26,19 @@ class Chat(models.Model):
     content = models.TextField(blank=True)
     # 评论时间
     c_time = models.DateTimeField(auto_now_add=True)
+
+
+class Task(models.Model):
+    task_id = models.AutoField(primary_key=True)
+    # 任务持有者
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # 标题
+    title = models.TextField(blank=True)
+    # 内容
+    content = models.TextField(blank=True)
+    # 是否重要
+    is_importance = models.BooleanField(default=False)
+    # 是否完成
+    is_accomplish = models.BooleanField(default=False)
+    # 创建日期
+    c_time = models.DateTimeField(auto_now_add=True)
