@@ -28,17 +28,31 @@ class Chat(models.Model):
     c_time = models.DateTimeField(auto_now_add=True)
 
 
-class Task(models.Model):
-    task_id = models.AutoField(primary_key=True)
-    # 任务持有者
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class TaskList(models.Model):
+    task_list_id = models.AutoField(primary_key=True)
+    # 所属卡组
+    group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE)
     # 标题
     title = models.TextField(blank=True)
     # 内容
     content = models.TextField(blank=True)
+    # 复习数量
+    review_nums = models.IntegerField(default=0)
+    # 创建日期
+    c_time = models.DateTimeField(auto_now_add=True)
+
+
+class Task(models.Model):
+    task_id = models.AutoField(primary_key=True)
+    # 任务持有者
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # 处于哪个任务列表中
+    task_list = models.ForeignKey(TaskList, on_delete=models.CASCADE)
     # 是否重要
     is_importance = models.BooleanField(default=False)
     # 是否完成
     is_accomplish = models.BooleanField(default=False)
+    # 是否处于垃圾桶中
+    is_read_delete = models.BooleanField(default=False)
     # 创建日期
     c_time = models.DateTimeField(auto_now_add=True)

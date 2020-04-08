@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from Deck.models import Deck
 from Login.models import User
-from StudyGroup.models import StudyGroup, Chat, Task
+from StudyGroup.models import StudyGroup, Chat, Task, TaskList
 
 from Deck.views import get_more_decks
 
@@ -152,35 +152,6 @@ def return_chat(request, chats):
     return all_chats
 
 
-# 添加task
-@csrf_exempt
-def create_task(request):
-    user_name = request.session['username']
-    user = User.objects.get(user_name=user_name)
-    title = request.POST.get('title')
-    content = request.POST.get('content')
-    task = Task(user=user, title=title, content=content)
-    task.save()
-    ret = {'status': True,
-           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
-    return HttpResponse(json.dumps(ret))
-
-
-# 修改task
-@csrf_exempt
-def update_task(request):
-    task_id = User.objects.get('task_id')
-    new_title = request.POST.get('title')
-    new_content = request.POST.get('content')
-    task = Task.objects.get(task_id=task_id)
-    task.title = new_title
-    task.content = new_content
-    task.save()
-    ret = {'status': True,
-           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
-    return HttpResponse(json.dumps(ret))
-
-
 # 设为importance
 @csrf_exempt
 def update_task_importance(request):
@@ -239,7 +210,7 @@ def delete_task(request):
     return HttpResponse(json.dumps(ret))
 
 
-# 获取所有task
+# 获取用户所有task
 @csrf_exempt
 def get_tasks(request):
     user_name = request.session['username']
@@ -253,3 +224,84 @@ def get_tasks(request):
         )
     ret = {'status': True, 'data': my_tasks}
     return HttpResponse(json.dumps(ret))
+
+
+@csrf_exempt
+def get_task_lists(request):
+    user_name = request.session['username']
+    user = User.objects.get(user_name=user_name)
+    creator_decks = user.deck_set.filter(is_public=False)
+    admin_decks = user.AdminsToDeck.filter(is_public=False).difference(creator_decks)
+    decks = chain(creator_decks, admin_decks)
+    groups = []
+    for deck in decks:
+        group = StudyGroup.objects.filter(deck_id=deck.deck_id)
+        if group:
+            group = group[0]
+            task_list = group.tasklist_set.all()
+            task_list = serializers.serialize("json", task_list)
+            task_list = json.loads(task_list)
+            groups.append({"group_id": group.group_id, "group_name": group.group_name,
+                           "tasks": task_list})
+    return HttpResponse(json.dumps({'status': True, 'data': groups}))
+
+
+# 管理员添加task
+@csrf_exempt
+def create_task(request):
+    group_id = request.POST.get('group_id')
+    title = request.POST.get('title')
+    content = request.POST.get('content')
+    review_nums = request.POST.get('review_nums')
+
+    group = StudyGroup.objects.get(group_id=group_id)
+    task_list = TaskList(group=group, title=title, content=content, review_nums=review_nums)
+    task_list.save()
+    deck = Deck.objects.get(deck_id=group.deck_id)
+    users = chain(deck.admins.all(), deck.staffs.all())
+    Task(user=deck.creator, task_list=task_list).save()
+    for user in users:
+        task = Task(user=user, task_list=task_list)
+        task.save()
+    ret = {'status': True,
+           'data': {'task_list_id': task_list.task_list_id,
+                    'c_time': task_list.c_time.strftime('%Y-%m-%d %H:%M:%S')}}
+    return HttpResponse(json.dumps(ret))
+
+
+# 修改task
+@csrf_exempt
+def update_task(request):
+    task_id = User.objects.get('task_id')
+    new_title = request.POST.get('title')
+    new_content = request.POST.get('content')
+    task = Task.objects.get(task_id=task_id)
+    task.title = new_title
+    task.content = new_content
+    task.save()
+    ret = {'status': True,
+           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
+    return HttpResponse(json.dumps(ret))
+
+
+# 管理员删除学习小组的task
+@csrf_exempt
+def delete_task_list(request):
+    task_list_id = request.POST.get('task_list_id')
+    TaskList.objects.get(task_list_id=task_list_id).delete()
+    return HttpResponse(json.dumps({'status': True}))
+
+
+# 管理员修改学习小组的task
+@csrf_exempt
+def update_task_list(request):
+    task_list_id = request.POST.get('task_list_id')
+    title = request.POST.get('title')
+    content = request.POST.get('content')
+    review_nums = request.POST.get('review_nums')
+    task_list = TaskList.objects.get(task_list_id=task_list_id)
+    task_list.title = title
+    task_list.content = content
+    task_list.review_nums = review_nums
+    task_list.save()
+    return HttpResponse(json.dumps({'status': True}))
