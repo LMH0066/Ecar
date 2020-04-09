@@ -16,10 +16,5 @@ urlpatterns = [
     path('DeleteTaskList', views.delete_task_list),
     path('UpdateTaskList', views.update_task_list),
     path('UpdateTask', views.update_task),
-    path('UpdateTaskImportance', views.update_task_importance),
-    path('UpdateTaskUnimportance', views.update_task_unimportance),
-    path('UpdateTaskAccomplish', views.update_task_accomplish),
-    path('UpdateTaskFail', views.update_task_fail),
-    path('DeleteTask', views.delete_task),
     path('GetTasks', views.get_tasks)
 ]

@@ -1,19 +1,17 @@
 import json
-import time
 from itertools import chain
+
 from django.core import serializers
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
 from Deck.models import Deck
+from Deck.views import get_more_decks
 from Login.models import User
 from StudyGroup.models import StudyGroup, Chat, Task, TaskList
-
-from Deck.views import get_more_decks
 
 
 def go_forum(request):
@@ -152,61 +150,35 @@ def return_chat(request, chats):
     return all_chats
 
 
-# 设为importance
+# 修改task
 @csrf_exempt
-def update_task_importance(request):
-    task_id = User.objects.get('task_id')
+def update_task(request):
+    task_id = request.POST.get('task_id')
     task = Task.objects.get(task_id=task_id)
-    task.is_importance = True
-    task.save()
-    ret = {'status': True,
-           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
-    return HttpResponse(json.dumps(ret))
+    operation = request.POST.get('operation')
+    is_delete = False
+    if operation == "importance":
+        task.is_importance = True
+    elif operation == "not_importance":
+        task.is_importance = False
+    elif operation == "accomplish":
+        task.is_accomplish = True
+    elif operation == "not_accomplish":
+        task.is_accomplish = False
+    elif operation == "delete":
+        if task.is_read_delete:
+            is_delete = True
+        else:
+            task.is_read_delete = True
+    elif operation == "not_delete":
+        task.is_read_delete = False
 
-
-# 设为unimportance
-@csrf_exempt
-def update_task_unimportance(request):
-    task_id = User.objects.get('task_id')
-    task = Task.objects.get(task_id=task_id)
-    task.is_importance = False
-    task.save()
-    ret = {'status': True,
-           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
-    return HttpResponse(json.dumps(ret))
-
-
-# 设为accomplish
-@csrf_exempt
-def update_task_accomplish(request):
-    task_id = User.objects.get('task_id')
-    task = Task.objects.get(task_id=task_id)
-    task.is_accomplish = True
-    task.save()
-    ret = {'status': True,
-           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
-    return HttpResponse(json.dumps(ret))
-
-
-# 设为fail
-@csrf_exempt
-def update_task_fail(request):
-    task_id = User.objects.get('task_id')
-    task = Task.objects.get(task_id=task_id)
-    task.is_accomplish = False
-    task.save()
-    ret = {'status': True,
-           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
-    return HttpResponse(json.dumps(ret))
-
-
-# 删除task
-@csrf_exempt
-def delete_task(request):
-    task_id = User.objects.get('task_id')
-    task = Task.objects.get(task_id=task_id)
-    task.delete()
-    ret = {'status': True}
+    if is_delete:
+        task.delete()
+    else:
+        task.save()
+    ret = {'status': True, 'data': {'is_importance': task.is_importance, 'is_accomplish': task.is_accomplish,
+                                    'is_ready_delete': task.is_read_delete}}
     return HttpResponse(json.dumps(ret))
 
 
@@ -219,8 +191,9 @@ def get_tasks(request):
     my_tasks = []
     for task in tasks:
         my_tasks.append(
-            {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'is_importance': task.is_importance,
-             'is_accomplish': task.is_accomplish, 'c_time': task.c_time}
+            {'task_id': task.task_id, 'title': task.task_list.title, 'content': task.task_list.content,
+             'is_importance': task.is_importance, 'is_accomplish': task.is_accomplish,
+             'is_ready_delete': task.is_read_delete, 'c_time': task.c_time.strftime('%Y-%m-%d %H:%M:%S')}
         )
     ret = {'status': True, 'data': my_tasks}
     return HttpResponse(json.dumps(ret))
@@ -266,21 +239,6 @@ def create_task(request):
     ret = {'status': True,
            'data': {'task_list_id': task_list.task_list_id,
                     'c_time': task_list.c_time.strftime('%Y-%m-%d %H:%M:%S')}}
-    return HttpResponse(json.dumps(ret))
-
-
-# 修改task
-@csrf_exempt
-def update_task(request):
-    task_id = User.objects.get('task_id')
-    new_title = request.POST.get('title')
-    new_content = request.POST.get('content')
-    task = Task.objects.get(task_id=task_id)
-    task.title = new_title
-    task.content = new_content
-    task.save()
-    ret = {'status': True,
-           'data': {'task_id': task.task_id, 'title': task.title, 'content': task.content, 'c_time': task.c_time}}
     return HttpResponse(json.dumps(ret))
 
 
