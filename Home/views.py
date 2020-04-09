@@ -180,12 +180,11 @@ def download_deck(request):
     while count != 0:
         num = num + 1
         deck_name = deck.name + "_" + str(num)
-        print(deck_name)
         count = Deck.objects.filter(creator=user, name=deck_name).count()
 
-    new_deck = Deck(name=deck_name, amount=deck.amount, creator=user)
+    new_deck = Deck(name=deck_name, amount=deck.amount, creator=user, today_learn_nums=deck.amount)
     new_deck.save()
-    new_deck_info = DeckInfo(deck=new_deck, user=user)
+    new_deck_info = DeckInfo(deck=new_deck, user=user, need_review_nums=deck.amount)
     new_deck_info.save()
     cards = Card.objects.filter(deck=deck)
     for card in cards:
