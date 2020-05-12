@@ -191,9 +191,11 @@ function WebSocketTest(findChat) {
         ws.onopen = function () {
             // Web Socket 已连接上，使用 send() 方法发送数据
             ws.send(group_id);
+            console.log("发送信息")
         };
 
         ws.onmessage = function (evt) {
+            console.log("接收信息")
             let ret = JSON.parse(evt.data);
             // console.log(ret);
             // console.log(chat_container);
@@ -211,6 +213,7 @@ function WebSocketTest(findChat) {
         };
 
         ws.onclose = function () {
+            console.log("连接关闭")
             // 关闭 websocket
             // alert("连接已关闭...");
         };
