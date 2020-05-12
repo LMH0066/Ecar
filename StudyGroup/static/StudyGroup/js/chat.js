@@ -186,7 +186,7 @@ function WebSocketTest(findChat) {
             window.s.close()
         }
         // 打开一个 web socket
-        let ws = new WebSocket("ws:/group/ChatWebsocket");
+        let ws = new WebSocket("wss://ecar.fun/group/ChatWebsocket");
 
         ws.onopen = function () {
             // Web Socket 已连接上，使用 send() 方法发送数据
