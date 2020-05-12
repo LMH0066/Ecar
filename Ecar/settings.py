@@ -147,6 +147,8 @@ CRONJOBS = (
     ('0 0 * * *', 'Deck.views.delete_old_code')
 )
 
+import dwebsocket
+
 MIDDLEWARE_CLASSES = [
     'dwebsocket.middleware.WebSocketMiddleware'
 ]

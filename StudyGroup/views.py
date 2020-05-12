@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
+from dwebsocket.decorators import accept_websocket
 
 from Deck.models import Deck
 from Deck.views import get_more_decks
@@ -77,19 +78,19 @@ def get_group_members(request):
 
 
 # 获取聊天记录
-@csrf_exempt
-def get_chats(request):
-    group_id = request.POST.get('group_id')
-    request.session['group_id'] = group_id
-
-    ret = {'status': True}
-    chats = Chat.objects.filter(Q(group_id=group_id)).order_by('c_time')
-    if chats.exists():
-        ret['data'] = return_chat(request, chats)
-    else:
-        ret['status'] = False
-        ret['data'] = 'No Chats'
-    return HttpResponse(json.dumps(ret))
+# @csrf_exempt
+# def get_chats(request):
+#     group_id = request.POST.get('group_id')
+#     request.session['group_id'] = group_id
+#
+#     ret = {'status': True}
+#     chats = Chat.objects.filter(Q(group_id=group_id)).order_by('c_time')
+#     if chats.exists():
+#         ret['data'] = return_chat(request, chats)
+#     else:
+#         ret['status'] = False
+#         ret['data'] = 'No Chats'
+#     return HttpResponse(json.dumps(ret))
 
 
 # 聊天
@@ -101,31 +102,31 @@ def chat_group(request):
     new_chat = Chat(from_user=user, content=content, group=study_group)
     new_chat.save()
 
-    if user.avatar:
-        author_avatar = serializers.serialize("json", user.avatar)
-        author_avatar = json.loads(author_avatar)
-    else:
-        author_avatar = "/static/images/avatar.jpg"
+    # if user.avatar:
+    #     author_avatar = serializers.serialize("json", user.avatar)
+    #     author_avatar = json.loads(author_avatar)
+    # else:
+    #     author_avatar = "/static/images/avatar.jpg"
 
-    ret = {'status': True, 'data': {
-        'user_name': user.user_name, 'user_avatar': author_avatar, 'chat_id': new_chat.chat_id,
-        'content': new_chat.content, 'c_time': new_chat.c_time.strftime('%Y-%m-%d %H:%M:%S')}}
-    return HttpResponse(json.dumps(ret))
+    # ret = {'status': True, 'data': {
+    #     'user_name': user.user_name, 'user_avatar': author_avatar, 'chat_id': new_chat.chat_id,
+    #     'content': new_chat.content, 'c_time': new_chat.c_time.strftime('%Y-%m-%d %H:%M:%S')}}
+    # return HttpResponse(json.dumps(ret))
+    return HttpResponse(json.dumps({'status': True}))
 
-
-@csrf_exempt
-def update_chat_message(request):
-    study_group = StudyGroup.objects.get(group_id=request.session['group_id'])
-    chat_id = request.POST.get('chat_id')
-    if chat_id == 'undefined':
-        chats = study_group.chat_set.all()
-    else:
-        chats = study_group.chat_set.filter(chat_id__gt=chat_id)
-    if chats:
-        all_chats = return_chat(request, chats)
-        return HttpResponse(json.dumps({'status': True, 'data': all_chats}))
-    else:
-        return HttpResponse(json.dumps({'status': False}))
+# @csrf_exempt
+# def update_chat_message(request):
+#     study_group = StudyGroup.objects.get(group_id=request.session['group_id'])
+#     chat_id = request.POST.get('chat_id')
+#     if chat_id == 'undefined':
+#         chats = study_group.chat_set.all()
+#     else:
+#         chats = study_group.chat_set.filter(chat_id__gt=chat_id)
+#     if chats:
+#         all_chats = return_chat(request, chats)
+#         return HttpResponse(json.dumps({'status': True, 'data': all_chats}))
+#     else:
+#         return HttpResponse(json.dumps({'status': False}))
 
 
 @csrf_exempt
@@ -148,6 +149,36 @@ def return_chat(request, chats):
              'from_is_me': from_is_me, 'chat_id': chat.chat_id}
         )
     return all_chats
+
+
+@accept_websocket
+def chat_websocket(request):
+    if request.is_websocket():
+        group_id = request.websocket.wait()
+        group_id = bytes.decode(group_id)
+        request.session['group_id'] = group_id
+        chats = Chat.objects.filter(Q(group_id=group_id)).order_by('c_time')
+        if chats.exists():
+            chat_id = chats.last().chat_id
+            chats = return_chat(request, chats)
+            request.websocket.send(json.dumps(chats))
+        else:
+            chat_id = -1
+
+        study_group = StudyGroup.objects.get(group_id=group_id)
+        while True:
+            chat = request.websocket.read()
+            if chat:
+                content = bytes.decode(chat)
+                user = User.objects.get(user_name=request.session['username'])
+                study_group = StudyGroup.objects.get(group_id=group_id)
+                new_chat = Chat(from_user=user, content=content, group=study_group)
+                new_chat.save()
+            chats = study_group.chat_set.filter(chat_id__gt=chat_id).order_by('c_time')
+            if chats.exists():
+                chat_id = chats.last().chat_id
+                all_chats = return_chat(request, chats)
+                request.websocket.send(json.dumps(all_chats))
 
 
 # 修改task

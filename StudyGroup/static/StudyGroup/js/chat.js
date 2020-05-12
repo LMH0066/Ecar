@@ -19,6 +19,7 @@ $('.mail-write-box').on('keydown', function (event) {
             return;
         }
         sendChat(chatMessageValue, chatInput);
+        chatInput.val('');
     }
 });
 
@@ -27,8 +28,12 @@ $('.hamburger, .chat-system .chat-box .chat-not-selected p').on('click', functio
 });
 // 用于判断是否正在轮循updateChat()
 let updateVal;
-// 以一次获取聊天信息
+
+// 第一次获取聊天信息
 function getChats(findChat) {
+    if (updateVal) {
+        clearInterval(updateVal);
+    }
     let group_id = findChat.split('_')[1];
     let form_data = new FormData();
     form_data.append('group_id', group_id);
@@ -59,9 +64,6 @@ function getChats(findChat) {
                 const getScrollContainer = document.querySelector('.chat-conversation-box');
                 getScrollContainer.scrollTop = getScrollContainer.scrollHeight;
             }
-            if (updateVal) {
-                clearInterval(updateVal);
-            }
             updateVal = setInterval(updateChat, 1000);
         },
         error: function () {
@@ -85,7 +87,8 @@ function showChat(div) {
         } else if (window.innerWidth > 767) {
             $('.chat-box .current-chat-user-name .name').html(personName);
         }
-        getChats(findChat);
+        // getChats(findChat);
+        WebSocketTest(findChat);
         $('.chat').removeClass('active-chat');
         $('.user-list-box .person').removeClass('active');
         $('.chat-box .chat-box-inner').css('height', '100%');
@@ -108,31 +111,32 @@ function showChat(div) {
 }
 
 function sendChat(content, chatInput) {
-    let form_data = new FormData();
-    form_data.append('content', content);
-    $.ajax({
-        url: "/group/ChatGroup",
-        type: "POST",
-        data: form_data,
-        cache: false,
-        contentType: false,
-        processData: false,
-        dataType: "json",
-        success: function (ret) {
-            if (ret['status']) {
-                let $messageHtml = '<div data-chat-id="' + ret['data']['chat_id'] + '" class="bubble me">' + content + '</div>';
-                chatInput.parents('.chat-system').find('.active-chat').append($messageHtml);
-                const getScrollContainer = document.querySelector('.chat-conversation-box');
-                getScrollContainer.scrollTop = getScrollContainer.scrollHeight;
-                chatInput.val('');
-            } else {
-                Oops(ret['data']);
-            }
-        },
-        error: function () {
-            Oops("");
-        }
-    })
+    window.s.send(content);
+    // let form_data = new FormData();
+    // form_data.append('content', content);
+    // $.ajax({
+    //     url: "/group/ChatGroup",
+    //     type: "POST",
+    //     data: form_data,
+    //     cache: false,
+    //     contentType: false,
+    //     processData: false,
+    //     dataType: "json",
+    //     success: function (ret) {
+    // if (ret['status']) {
+    //     let $messageHtml = '<div data-chat-id="' + ret['data']['chat_id'] + '" class="bubble me">' + content + '</div>';
+    //     chatInput.parents('.chat-system').find('.active-chat').append($messageHtml);
+    //     const getScrollContainer = document.querySelector('.chat-conversation-box');
+    //     getScrollContainer.scrollTop = getScrollContainer.scrollHeight;
+    //     chatInput.val('');
+    // } else {
+    //     Oops(ret['data']);
+    // }
+    //     },
+    //     error: function () {
+    //         Oops("");
+    //     }
+    // })
 }
 
 function updateChat() {
@@ -169,5 +173,52 @@ function updateChat() {
                 Oops("");
             }
         })
+    }
+}
+
+
+function WebSocketTest(findChat) {
+    let chat_container = $('#chat-conversation-box-scroll .chat[data-chat = ' + findChat + ']');
+    chat_container.empty();
+    if ("WebSocket" in window) {
+        let group_id = findChat.split('_')[1];
+        if (window.s) {
+            window.s.close()
+        }
+        // 打开一个 web socket
+        let ws = new WebSocket("ws://127.0.0.1:8000/group/ChatWebsocket");
+
+        ws.onopen = function () {
+            // Web Socket 已连接上，使用 send() 方法发送数据
+            ws.send(group_id);
+        };
+
+        ws.onmessage = function (evt) {
+            let ret = JSON.parse(evt.data);
+            // console.log(ret);
+            // console.log(chat_container);
+            for (let i = 0; i < ret.length; i++) {
+                let $messageHtml;
+                if (ret[i]['from_is_me']) {
+                    $messageHtml = '<div data-chat-id="' + ret[i]['chat_id'] + '" class="bubble me">' + ret[i]['content'] + '</div>';
+                } else {
+                    $messageHtml = '<div data-chat-id="' + ret[i]['chat_id'] + '" class="bubble you">' + ret[i]['content'] + '</div>';
+                }
+                $('.mail-write-box').parents('.chat-system').find('.active-chat').append($messageHtml);
+            }
+            const getScrollContainer = document.querySelector('.chat-conversation-box');
+            getScrollContainer.scrollTop = getScrollContainer.scrollHeight;
+        };
+
+        ws.onclose = function () {
+            // 关闭 websocket
+            // alert("连接已关闭...");
+        };
+
+        if (ws.readyState === WebSocket.OPEN) ws.onopen();
+        window.s = ws;
+    } else {
+        // 浏览器不支持 WebSocket
+        alert("您的浏览器不支持 WebSocket!");
     }
 }
