@@ -153,3 +153,4 @@ MIDDLEWARE_CLASSES = [
     'dwebsocket.middleware.WebSocketMiddleware'
 ]
 WEBSOCKET_ACCEPT_ALL = True  # 可以允许每一个单独的视图使用websockets
+WEBSOCKET_FACTORY_CLASS = 'dwebsocket.backends.uwsgi.factory.uWsgiWebSocketFactory'
