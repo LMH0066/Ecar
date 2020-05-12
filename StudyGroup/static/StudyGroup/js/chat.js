@@ -187,7 +187,7 @@ function WebSocketTest(findChat) {
         }
         let ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
         // 打开一个 web socket
-        let ws = new WebSocket(ws_scheme + "://localhost:8000/group/ChatWebsocket");
+        let ws = new WebSocket(ws_scheme + "://" + window.location.host + "/group/ChatWebsocket");
 
         ws.onopen = function () {
             // Web Socket 已连接上，使用 send() 方法发送数据
