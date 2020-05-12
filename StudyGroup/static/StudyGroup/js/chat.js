@@ -188,7 +188,7 @@ function WebSocketTest(findChat) {
         // 打开一个 web socket
         let ws = new WebSocket("wss://ecar.fun/group/ChatWebsocket");
 
-        ws.onopen = function () {
+        ws.onopen = function (evt) {
             // Web Socket 已连接上，使用 send() 方法发送数据
             ws.send(group_id);
             console.log("发送信息")
@@ -218,7 +218,7 @@ function WebSocketTest(findChat) {
             // alert("连接已关闭...");
         };
 
-        if (ws.readyState === WebSocket.OPEN) ws.onopen();
+        if (ws.readyState === WebSocket.OPEN) ws.onopen(group_id);
         window.s = ws;
     } else {
         // 浏览器不支持 WebSocket
