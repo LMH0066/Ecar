@@ -1,15 +1,14 @@
-from uuid import uuid4
-from uuid import uuid1
-
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.core import serializers
+import datetime
 import json
+
+from django.core import serializers
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
 
 from Card.models import Card, MemoryInfo
 from Deck.models import Deck, DeckInfo
-from Login.models import User
+from Login.models import User, PastInfo
 from .models import PublicDecks, Comment
 
 
@@ -207,3 +206,28 @@ def is_creator(request):
         ret['status'] = False
         ret['data'] = 'Insufficient permissions'
     return HttpResponse(json.dumps(ret))
+
+
+# 记忆曲线
+@csrf_exempt
+def memory_curve(request):
+    # 填入最近 15 天信息
+    memory_curve = []
+    LIMIT_COUNT = 14
+    user_name = request.session['username']
+    limit_time = datetime.date.today() - datetime.timedelta(LIMIT_COUNT)
+    past_infos = PastInfo.objects.filter(user__user_name=user_name,
+                                         time__lte=datetime.date.today(),
+                                         time__gte=limit_time)
+    temp_time = datetime.date.today() - datetime.timedelta(LIMIT_COUNT)
+    while temp_time.__lt__(datetime.date.today()) or temp_time.__eq__(datetime.date.today()):
+        flag = False
+        for info in past_infos:
+            if temp_time.__eq__(info.time):
+                memory_curve.append([info.memory_count, info.review_count, info.time])
+                flag = True
+                break
+        if flag is False:
+            memory_curve.append([0, 0, temp_time])
+        temp_time = temp_time + datetime.timedelta(1)
+    return HttpResponse(json.dump(memory_curve))

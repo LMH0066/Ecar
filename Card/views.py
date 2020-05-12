@@ -1,19 +1,16 @@
+import datetime
 import json
+from itertools import chain
 
+from django.core import serializers
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-
 # Create your views here.
-from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from django.forms.models import model_to_dict
-from django.core import serializers
-from itertools import chain
 
 from Card.models import Card, MemoryInfo
 from Deck.models import Deck, DeckInfo
-from Login.models import User
-import datetime
+from Login.models import User, PastInfo
 
 
 # 访问卡片复习页面
@@ -245,6 +242,18 @@ def remember_card(request):
     memory_info.now_correct_times += 1
     if memory_info.now_correct_times >= memory_info.need_correct_times:
         deck_info = DeckInfo.objects.get(user__user_name=user_name, deck_id=deck_id)
+        # 添加更新今日记忆信息
+        try:
+            past_info = PastInfo.objects.get(user__user_name=user_name, time=datetime.date.today())
+        except:
+            user = User.objects.get(user_name=user_name)
+            past_info = PastInfo(user=user)
+        if (memory_info.review_time.__lt__(datetime.date.today())) or (
+                memory_info.review_time.__eq__(datetime.date.today())):
+            past_info.review_count = past_info.review_count + 1
+        else:
+            past_info.memory_count = past_info.memory_count + 1
+        past_info.save()
         # 清零
         memory_info.now_correct_times = 0
         memory_info.last_memory_time = datetime.date.today()

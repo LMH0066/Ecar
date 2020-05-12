@@ -17,3 +17,15 @@ class User(models.Model):
     class Meta:
         ordering = ["c_time"]
         verbose_name = verbose_name_plural = "用户"
+
+
+# 过去时间的记忆信息.
+class PastInfo(models.Model):
+    # 用户
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # 当天记忆数目
+    memory_count = models.IntegerField(default=0)
+    # 当天复习数目
+    review_count = models.IntegerField(default=0)
+    # 时间
+    time = models.DateField(auto_now_add=True)

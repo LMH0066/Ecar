@@ -12,5 +12,6 @@ urlpatterns = [
     path('CommentDeck', views.comment_deck),
     path('ShowDeckComments', views.show_deck_comments),
     path('IsCreator', views.is_creator),
-    path('DownloadDeck', views.download_deck)
+    path('DownloadDeck', views.download_deck),
+    path('MemoryCurve', views.memory_curve)
 ]
