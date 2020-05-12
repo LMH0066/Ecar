@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 from dwebsocket.decorators import accept_websocket
+from collections import defaultdict
 
 from Deck.models import Deck
 from Deck.views import get_more_decks
@@ -94,13 +95,13 @@ def get_group_members(request):
 
 
 # 聊天
-@csrf_exempt
-def chat_group(request):
-    user = User.objects.get(user_name=request.session['username'])
-    study_group = StudyGroup.objects.get(group_id=request.session['group_id'])
-    content = request.POST.get('content')
-    new_chat = Chat(from_user=user, content=content, group=study_group)
-    new_chat.save()
+# @csrf_exempt
+# def chat_group(request):
+#     user = User.objects.get(user_name=request.session['username'])
+#     study_group = StudyGroup.objects.get(group_id=request.session['group_id'])
+#     content = request.POST.get('content')
+#     new_chat = Chat(from_user=user, content=content, group=study_group)
+#     new_chat.save()
 
     # if user.avatar:
     #     author_avatar = serializers.serialize("json", user.avatar)
@@ -112,7 +113,8 @@ def chat_group(request):
     #     'user_name': user.user_name, 'user_avatar': author_avatar, 'chat_id': new_chat.chat_id,
     #     'content': new_chat.content, 'c_time': new_chat.c_time.strftime('%Y-%m-%d %H:%M:%S')}}
     # return HttpResponse(json.dumps(ret))
-    return HttpResponse(json.dumps({'status': True}))
+    # return HttpResponse(json.dumps({'status': True}))
+
 
 # @csrf_exempt
 # def update_chat_message(request):
@@ -151,26 +153,31 @@ def return_chat(request, chats):
     return all_chats
 
 
+# allconn = defaultdict(dict)
+
+
 @accept_websocket
-def chat_websocket(request):
+def chat_websocket(request, user_name):
     if request.is_websocket():
+        user = User.objects.get(user_name=user_name)
         group_id = request.websocket.wait()
         group_id = bytes.decode(group_id)
-        request.session['group_id'] = group_id
+        conn = request.websocket
+        # global allconn
+        # allconn[group_id][user.user_id] = conn
         chats = Chat.objects.filter(Q(group_id=group_id)).order_by('c_time')
         if chats.exists():
             chat_id = chats.last().chat_id
             chats = return_chat(request, chats)
-            request.websocket.send(json.dumps(chats))
+            conn.send(json.dumps(chats))
         else:
             chat_id = -1
 
         study_group = StudyGroup.objects.get(group_id=group_id)
         while True:
-            chat = request.websocket.read()
+            chat = conn.read()
             if chat:
                 content = bytes.decode(chat)
-                user = User.objects.get(user_name=request.session['username'])
                 study_group = StudyGroup.objects.get(group_id=group_id)
                 new_chat = Chat(from_user=user, content=content, group=study_group)
                 new_chat.save()
