@@ -10,5 +10,6 @@ urlpatterns = [
     path('LoginPost', views.login_post),                    # 登录请求
     path('RegisterPost', views.register_post),              # 注册请求
     path('SignOut', views.sign_out),                        # 登出请求
-    path('AccessInformation', views.get_information)        # 请求获取用户信息
+    path('AccessInformation', views.get_information),       # 请求获取用户信息
+    path('MemoryCurve', views.memory_curve)                 # 返回记忆曲线
 ]

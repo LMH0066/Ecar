@@ -112,45 +112,58 @@ function deletePublicDeck(svg) {
 }
 
 function showLearningLine() {
-    let sLineArea = {
-        chart: {
-            height: 350,
-            type: 'area',
-            toolbar: {
-                show: false,
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: 'smooth'
-        },
-        series: [{
-            name: 'study nums',
-            data: [31, 40, 28, 51, 42, 109, 100]
-        }, {
-            name: 'review nums',
-            data: [11, 32, 45, 32, 34, 52, 41]
-        }],
+    $.ajax({
+        url: "/auth/MemoryCurve",
+        type: "POST",
+        cache: false,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function (ret) {
+            console.log(ret);
+            let sLineArea = {
+                chart: {
+                    height: 350,
+                    type: 'area',
+                    toolbar: {
+                        show: false,
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth'
+                },
+                series: [{
+                    name: 'memory nums',
+                    data: ret['memory_count']
+                }, {
+                    name: 'review nums',
+                    data: ret['review_count']
+                }],
 
-        xaxis: {
-            type: 'datetime',
-            categories: ["2018-09-19T00:00:00", "2018-09-19T01:30:00",
-                "2018-09-19T02:30:00", "2018-09-19T03:30:00",
-                "2018-09-19T04:30:00", "2018-09-19T05:30:00", "2018-09-19T06:30:00"],
+                xaxis: {
+                    type: 'date',
+                    categories: ret['time'],
+                },
+                tooltip: {
+                    x: {
+                        format: 'dd/MM/yy'
+                    },
+                }
+            };
+
+            let chart = new ApexCharts(
+                document.querySelector("#s-line-area"),
+                sLineArea
+            );
+
+            chart.render();
         },
-        tooltip: {
-            x: {
-                format: 'dd/MM/yy HH:mm'
-            },
+        error: function () {
+            Oops("");
         }
-    };
+    })
 
-    let chart = new ApexCharts(
-        document.querySelector("#s-line-area"),
-        sLineArea
-    );
-
-    chart.render();
 }
