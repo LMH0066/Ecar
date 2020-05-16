@@ -175,17 +175,20 @@ def chat_websocket(request, user_name):
 
         study_group = StudyGroup.objects.get(group_id=group_id)
         while True:
-            chat = conn.read()
-            if chat:
-                content = bytes.decode(chat)
-                study_group = StudyGroup.objects.get(group_id=group_id)
-                new_chat = Chat(from_user=user, content=content, group=study_group)
-                new_chat.save()
+            content = conn.read()
+            if content:
+                content = bytes.decode(content)
+                if content == "keepalive":
+                    conn.send("keepalive")
+                else:
+                    study_group = StudyGroup.objects.get(group_id=group_id)
+                    new_chat = Chat(from_user=user, content=content, group=study_group)
+                    new_chat.save()
             chats = study_group.chat_set.filter(chat_id__gt=chat_id).order_by('c_time')
             if chats.exists():
                 chat_id = chats.last().chat_id
                 all_chats = return_chat(request, chats)
-                request.websocket.send(json.dumps(all_chats))
+                conn.send(json.dumps(all_chats))
 
 
 # 修改task
@@ -264,6 +267,8 @@ def create_task(request):
     title = request.POST.get('title')
     content = request.POST.get('content')
     review_nums = request.POST.get('review_nums')
+    if not review_nums:
+        review_nums = 0
 
     group = StudyGroup.objects.get(group_id=group_id)
     task_list = TaskList(group=group, title=title, content=content, review_nums=review_nums)

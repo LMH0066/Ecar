@@ -197,6 +197,10 @@ function WebSocketTest(findChat) {
         };
 
         ws.onmessage = function (evt) {
+            if (evt.data === "keepalive") {
+                console.log("beat!");
+                return
+            }
             // console.log("接收信息")
             let ret = JSON.parse(evt.data);
             // console.log(ret);
@@ -219,9 +223,8 @@ function WebSocketTest(findChat) {
             // 关闭 websocket
             // alert("连接已关闭...");
         };
-
-        if (ws.readyState === WebSocket.OPEN) ws.onopen();
         window.s = ws;
+        if (ws.readyState === WebSocket.OPEN) ws.onopen();
     } else {
         // 浏览器不支持 WebSocket
         alert("您的浏览器不支持 WebSocket!");
