@@ -175,18 +175,30 @@ def get_memory_card(request):
     new_infos = MemoryInfo.objects.filter(user__user_name=user_name,
                                           card__deck__deck_id=deck_id,
                                           memory_times=0).order_by('?')
-    infos = chain(review_infos, new_infos)
-    if review_infos.count() + new_infos.count() > single_nums:
-        infos = infos[:single_nums]
-        for info in infos:
-            memory_cards.append(info.card)
-    elif infos:
-        for info in infos:
-            memory_cards.append(info.card)
-    else:
+
+    if review_infos.count() + new_infos.count() == 0:
         ret['status'] = False
         ret['data'] = "No Card To Learn"
         return HttpResponse(json.dumps(ret))
+
+    if review_infos.count() > single_nums:
+        review_infos = review_infos[:single_nums]
+        single_nums = 0
+        for info in review_infos:
+            memory_cards.append(info.card)
+    elif review_infos:
+        single_nums -= review_infos.count()
+        for info in review_infos:
+            memory_cards.append(info.card)
+
+    if single_nums:
+        if new_infos.count() > single_nums:
+            new_infos = new_infos[:single_nums]
+            for info in new_infos:
+                memory_cards.append(info.card)
+        elif new_infos:
+            for info in new_infos:
+                memory_cards.append(info.card)
 
     # infos = MemoryInfo.objects.filter(user__user_name=user_name,
     #                                   card__deck__deck_id=deck_id,
